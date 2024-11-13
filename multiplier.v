@@ -1,6 +1,8 @@
 module multiplier
 #(
-    
+    parameter dupa,
+    parameter int dupa2,
+    parameter [9:0] dupa3 = ;
 )
 (
     input wire [15:0] data_in,

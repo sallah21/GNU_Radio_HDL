@@ -1,5 +1,5 @@
 import argparse
-from verilog_parser import Verilog_parser
+from verilog_parser import Verilog_parser, port_type, Port
 def main():
     parser = argparse.ArgumentParser(prog="GNU Radio HDL parser",
                                      description="Parser for HDL module used to implement GNU Radio OOT object",
@@ -14,9 +14,12 @@ def main():
     params = v_parser.parse_parameters()
     print(f"params\n {params}")
 
-    in_ports, out_ports, inout_ports = v_parser.parse_ports()
-    print(f"in_ports\n {in_ports} \n")
-    print(f"out_ports\n {out_ports} \n")
+    ports = v_parser.parse_ports()
+    input_ports = [port for port in ports if port.type == port_type.IN]
+    output_ports = [port for port in ports if port.type == port_type.OUT]
+    inout_ports = [port for port in ports if port.type == port_type.INOUT]
+    print(f"in_ports\n {input_ports} \n")
+    print(f"out_ports\n {output_ports} \n")
     print(f"inout_ports\n {inout_ports} \n")
 
     
