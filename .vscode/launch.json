@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "YML Generator",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "/Users/salsamon/Library/Mobile Documents/com~apple~CloudDocs/Magisterka/GNU_Radio_HDL/gr-OOT_HDL/python/OOT_HDL/YAML_generator.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python Debugger: Current File with Arguments",
             "type": "debugpy",
             "request": "launch",

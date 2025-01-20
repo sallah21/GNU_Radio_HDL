@@ -19,9 +19,9 @@ class Port:
 
 class Verilog_parser:
     def __init__(self, path):
-        # TODO: create data type for port 
         self.filename = Path(path)
         self.file_conent = ""
+        self.moudule_name = "default_module_name"
         self.parameters = {}
         self.ports = []
 
@@ -36,13 +36,11 @@ class Verilog_parser:
         matches = re.findall(pattern, self.file_conent)
         for match in matches:
             self.parameters[match] = 0
-        return self.parameters
         
     
     def parse_ports(self):
         pattern = r"\b(input|output|inout)\b\s*(?:(signed|unsigned)\s+)?(?:wire|reg|logic|bit|integer|real|time|int|shortint|longint)?\s*(?:\[\s*\d+\s*:\s*\d+\s*\])?\s*([a-zA-Z_][a-zA-Z0-9_$]*)"
         matches = re.findall(pattern, self.file_conent)
-        # print(f"Matches {matches} \n")
         for match in matches:
             port =  None
             type = port_type(match[0])
@@ -51,15 +49,42 @@ class Verilog_parser:
             elif (match[1] < 1):
                 raise ValueError(" Size negative or zero")
             else :
-                # print(f"NAME: {match[2]} , SIZE: {match[1]}, TYPE: {match[0]}\n")
                 port = Port(match[2], match[1] , type)
             self.ports.append(port)
-        return self.ports
 
+    def parse_module_name(self):
+        pattern = r"module\s+([a-zA-Z_][a-zA-Z0-9_$]*)"
+        match = re.search(pattern, self.file_conent)
+        if match:
+            self.moudule_name = match.group(1)
+        else:
+            raise ValueError("Module name not found")
+
+    def parse_module(self):
+        self.parse_parameters()
+        self.parse_ports()
+        self.parse_module_name()
+        pass
+
+    def get_module_name(self):
+        return self.moudule_name
 
     def get_parameters(self):
-        pass
-
+        return self.parameters
 
     def get_ports(self):
-        pass
+        return self.ports
+
+    # Output instance information
+    def dump(self):
+        print(f"Module name: {self.moudule_name}")
+        print(f"Parameters: {self.parameters}")
+        print(f"Ports: {self.ports}")
+
+    # Save instance information to a file
+    def save(self, filename):
+        with open(filename, "w") as f:
+            f.write(f"Module name: {self.moudule_name}\n")
+            f.write(f"Parameters: {self.parameters}\n")
+            f.write(f"Ports: {self.ports}\n")
+    

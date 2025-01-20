@@ -1,0 +1,6 @@
+/*!
+ * \defgroup block GNU Radio OOT_HDL C++ Signal Processing Blocks
+ * \brief All C++ blocks that can be used from the OOT_HDL GNU Radio
+ *        module are listed here or in the subcategories below.
+ *
+ */
