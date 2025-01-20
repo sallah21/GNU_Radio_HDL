@@ -7,4 +7,5 @@
 #
 
 install(FILES
-    OOT_HDL_HDL_module.block.yml DESTINATION share/gnuradio/grc/blocks)
+    OOT_HDL_HDL_module.block.yml
+    OOT_HDL_module_creator.block.yml DESTINATION share/gnuradio/grc/blocks)

@@ -3,37 +3,41 @@ id: multiplier
 label: multiplier
 category: '[OOT_HDL]'
 
+templates:
+    imports: from gnuradio import OOT_HDL
+    
+
 parameters:
-        - id: dupa
-          label: dupa
-          dtype: int
-          default: 0
+    -   id: dupa
+        label: dupa
+        dtype: int
+        default: 0
 
-        - id: dupa2
-          label: dupa2
-          dtype: int
-          default: 0
+    -   id: dupa2
+        label: dupa2
+        dtype: int
+        default: 0
 
-        - id: dupa3
-          label: dupa3
-          dtype: int
-          default: 0
+    -   id: dupa3
+        label: dupa3
+        dtype: int
+        default: 0
 
 
 
 inputs:
-        - label: data_in
-          domain: stream
-          dtype: raw
+    -   label: data_in
+        domain: stream
+        dtype: int
+        vlen: 32
 
 
 
 outputs:
-        - label: data_out
-          domain: stream
-          dtype: raw
-
-
+    -   label: data_out
+        domain: stream
+        dtype: int
+        vlen: 32 
 
 
 #  'file_format' specifies the version of the GRC yml format used in the file

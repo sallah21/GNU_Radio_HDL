@@ -20,7 +20,11 @@ add_subdirectory(bindings)
 # Install python sources
 ########################################################################
 gr_python_install(FILES __init__.py
-    HDL_module.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OOT_HDL)
+    HDL_module.py
+    verilog_parser.py
+    YAML_generator.py
+    module_creator.py
+    DESTINATION ${GR_PYTHON_DIR}/gnuradio/OOT_HDL)
 
 ########################################################################
 # Handle the unit tests

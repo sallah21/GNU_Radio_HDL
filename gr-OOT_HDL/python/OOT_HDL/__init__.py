@@ -20,5 +20,6 @@ except ModuleNotFoundError:
     pass
 
 # import any pure python here
-
+from .module_creator import module_creator
+from .HDL_module import HDL_module
 #

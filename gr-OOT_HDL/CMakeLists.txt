@@ -35,6 +35,9 @@ endif()
 list(INSERT CMAKE_MODULE_PATH 0 ${PROJECT_SOURCE_DIR}/cmake/Modules)
 # Find gnuradio to get access to the cmake modules
 find_package(Gnuradio "3.10" REQUIRED)
+message(STATUS "Found Gnuradio: ${Gnuradio_DIR}")
+message(STATUS "Gnuradio Include Dirs: ${GNURADIO_ALL_INCLUDE_DIRS}")
+message(STATUS "Gnuradio Libraries: ${GNURADIO_ALL_LIBRARIES}")
 
 # Set the version information here
 # cmake-format: off

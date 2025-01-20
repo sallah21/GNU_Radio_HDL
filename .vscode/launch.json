@@ -9,7 +9,7 @@
             "name": "YML Generator",
             "type": "debugpy",
             "request": "launch",
-            "program": "/Users/salsamon/Library/Mobile Documents/com~apple~CloudDocs/Magisterka/GNU_Radio_HDL/gr-OOT_HDL/python/OOT_HDL/YAML_generator.py",
+            "program": "${workspaceFolder}/gr-OOT_HDL/python/OOT_HDL/YAML_generator.py",
             "console": "integratedTerminal"
         },
         
@@ -18,10 +18,10 @@
             "name": "YML Generator - generate with arguments",
             "type": "debugpy",
             "request": "launch",
-            "program": "/Users/salsamon/Library/Mobile Documents/com~apple~CloudDocs/Magisterka/GNU_Radio_HDL/gr-OOT_HDL/python/OOT_HDL/YAML_generator.py",
+            "program": "${workspaceFolder}/gr-OOT_HDL/python/OOT_HDL/YAML_generator.py",
             "console": "integratedTerminal",
             "args": [
-                "/Users/salsamon/Documents/Magisterka/gr-OOT_HDL/grc/OOT_HDL_HDL_module.block.yml"
+                "${workspaceFolder}/grc/OOT_HDL_HDL_module.block_gen.yml"
             ]
         },
         {
@@ -31,7 +31,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "args": [
-                "multiplier.v"
+                "${workspaceFolder}/multiplier.v"
             ]
         }
     ]
