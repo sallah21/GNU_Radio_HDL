@@ -13,7 +13,7 @@ class port_type(Enum):
 @dataclass
 class Port:
     name:string
-    size: int
+    size: string
     type: port_type
 
 
@@ -39,17 +39,17 @@ class Verilog_parser:
         
     
     def parse_ports(self):
-        pattern = r"\b(input|output|inout)\b\s*(?:(signed|unsigned)\s+)?(?:wire|reg|logic|bit|integer|real|time|int|shortint|longint)?\s*(?:\[\s*\d+\s*:\s*\d+\s*\])?\s*([a-zA-Z_][a-zA-Z0-9_$]*)"
+        pattern = r"\b(input|output|inout)\b\s*(?:(signed|unsigned)\s+)?(?:wire|reg|logic|bit|integer|real|time|int|shortint|longint)?\s*(?:\[\s*(\d+)\s*:\s*\d+\s*\])?\s*([a-zA-Z_][a-zA-Z0-9_$]*)"
         matches = re.findall(pattern, self.file_conent)
         for match in matches:
-            port =  None
-            type = port_type(match[0])
-            if (match[1] == ''):
-                port = Port(match[2], 1 , type)
-            elif (match[1] < 1):
-                raise ValueError(" Size negative or zero")
-            else :
-                port = Port(match[2], match[1] , type)
+            print(match)
+            port_direction, sign, size_str, name = match
+            port = None
+            type = port_type(port_direction)
+            
+            # Convert size string to int, default to 1 if no size specified
+            size = int(size_str) + 1 if size_str else 1
+            port = Port(name, size, type)
             self.ports.append(port)
 
     def parse_module_name(self):
@@ -87,4 +87,3 @@ class Verilog_parser:
             f.write(f"Module name: {self.moudule_name}\n")
             f.write(f"Parameters: {self.parameters}\n")
             f.write(f"Ports: {self.ports}\n")
-    

@@ -10,6 +10,7 @@
 import numpy
 from gnuradio import gr
 from verilog_parser import Verilog_parser, port_type, Port
+from YAML_generator import yml_generator
 
 class HDL_module(gr.basic_block):
     """
@@ -28,6 +29,10 @@ class HDL_module(gr.basic_block):
         self.module_name = v_parser.parse_module_name()
 
         # TODO: create parser for module name and parse size of ports to most fitable value
+        # generator = yml_generator()
+        # yaml_content = generator.generate(self.module_name, self.params, self.ports).get_yml_content()
+        # generator.save_to_file(yaml_content, "/Users/salsamon/Library/Mobile Documents/com~apple~CloudDocs/Magisterka/GNU_Radio_HDL/gr-OOT_HDL/grc/OOT_HDL_HDL_module.block.yml")
+
         gr.basic_block.__init__(self,
             name="HDL_module",
             in_sig=[Port(port_type.IN, numpy.int32) for port in self.ports],

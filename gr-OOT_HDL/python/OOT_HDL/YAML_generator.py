@@ -1,8 +1,4 @@
-# from yaml import dump
-# try:
-#     from yaml import CDumper as Dumper
-# except ImportError:
-#     from yaml import Dumper
+
 from verilog_parser import Verilog_parser, Port, port_type
 
 class yml_generator:
@@ -11,6 +7,7 @@ class yml_generator:
         self.parameters = {}
         self.input_ports = []
         self.output_ports = []
+        self.yml_content = ""
         self.template = '''
         id: ${module_name}
         label: ${module_name}
@@ -67,7 +64,15 @@ ${output_ports}
         yaml_content = yaml_content.replace('${input_ports}', input_ports_yaml)
         yaml_content = yaml_content.replace('${output_ports}', output_ports_yaml)
         
-        return yaml_content
+        self.yml_content = yaml_content
+
+
+    def get_yml_content(self):
+        return self.yml_content
+
+    def save_to_file(self, filename):
+        with open(filename, "w") as f:
+            f.write(self.yml_content)
 
 if __name__ == "__main__":
     import verilog_parser
@@ -81,5 +86,5 @@ if __name__ == "__main__":
     inout_ports = [port for port in ports if port.type == port_type.INOUT]
     parameters = verilog_parser.get_parameters()
     verilog_parser.dump()
-    yaml_content = generator.generate(verilog_parser.get_module_name(), parameters, input_ports, output_ports)
+    yaml_content = generator.generate(verilog_parser.get_module_name(), parameters, input_ports, output_ports).get_yml_content()
     print(yaml_content) 
