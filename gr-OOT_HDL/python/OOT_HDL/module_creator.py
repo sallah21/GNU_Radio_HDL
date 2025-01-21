@@ -49,7 +49,7 @@ import numpy
 from gnuradio import gr
 import os
 import socket
-
+import threading 
 class {self.module_name}(gr.basic_block):
     \"\"\"
     docstring for block {self.module_name}
@@ -66,8 +66,34 @@ class {self.module_name}(gr.basic_block):
         self.socket.bind(('', 12345))
         self.socket.listen(1)
         with open("{TEST_DIR}/OOT_HDL_{self.module_name}.txt", "w") as f:
-            f.write("SERVER STARTED")
+            f.write("SOCKET STARTED")
         #self.server = self.socket.accept()[0]
+        self.server_Thread = threading.Thread(target=self.handle_connection)
+        self.server_Thread.daemon = True
+        self.server_Thread.start()
+
+    def handle_connection(self):
+        with open("{TEST_DIR}/OOT_HDL_{self.module_name}.txt", "w") as f:
+            f.write("SERVER STARTED")
+        while True:
+            try:
+                with open("{TEST_DIR}/OOT_HDL_{self.module_name}.txt", "w") as f:
+                    f.write("Wait for connection from server")
+                client, addr = self.socket.accept()
+                print(f"Connection from server")
+                with open("{TEST_DIR}/OOT_HDL_{self.module_name}.txt", "w") as f:
+                    f.write("Connection from server")
+                while True:
+                    if len(self.data_buffer) > 0:
+                        data = self.data_buffer.popleft()
+                        client.send(json.dumps(data).encode() + b'\\n')
+            except Exception as e:
+                print(f"Server error: ")
+                with open("{TEST_DIR}/OOT_HDL_{self.module_name}.txt", "w") as f:
+                    f.write("CAN'T CONNECT")
+                continue
+
+    
 
     def forecast(self, noutput_items, ninputs):
         # ninputs is the number of input connections

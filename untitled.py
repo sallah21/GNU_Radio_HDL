@@ -20,7 +20,7 @@ from PyQt5 import Qt
 from argparse import ArgumentParser
 from gnuradio.eng_arg import eng_float, intx
 from gnuradio import eng_notation
-
+import time
 
 
 class untitled(gr.top_block, Qt.QWidget):
@@ -90,6 +90,7 @@ class untitled(gr.top_block, Qt.QWidget):
 
         # Testing server
         self.adder_0 = OOT_HDL.adder(1,2,3)
+        time.sleep(10)
         print("SIM DONE")
         ##################################################
         # Connections
