@@ -22,4 +22,16 @@ except ModuleNotFoundError:
 # import any pure python here
 from .module_creator import module_creator
 from .HDL_module import HDL_module
+from .multiplier_32b import multiplier_32b
+from .adder import adder
+
+
+
+
+
+
+
+
 #
+
+

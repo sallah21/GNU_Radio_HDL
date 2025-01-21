@@ -49,7 +49,7 @@ class Verilog_parser:
         pattern = r"\b(input|output|inout)\b\s*(?:(signed|unsigned)\s+)?(?:wire|reg|logic|bit|integer|real|time|int|shortint|longint)?\s*(?:\[\s*(\d+)\s*:\s*\d+\s*\])?\s*([a-zA-Z_][a-zA-Z0-9_$]*)"
         matches = re.findall(pattern, self.file_conent)
         for match in matches:
-            print(match)
+            # print(match)
             port_direction, sign, size_str, name = match
             port = None
             type = port_type(port_direction)
@@ -94,6 +94,12 @@ class Verilog_parser:
     def get_ports(self):
         return self.ports
 
+    def cleanup(self):
+        self.filename = None
+        self.file_conent = ""
+        self.moudule_name = "default_module_name"
+        self.parameters = {}
+        self.ports = []
 
     # Output instance information
     def dump(self):

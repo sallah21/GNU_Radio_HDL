@@ -5,7 +5,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-
 install(FILES
     OOT_HDL_HDL_module.block.yml
-    OOT_HDL_module_creator.block.yml DESTINATION share/gnuradio/grc/blocks)
+    OOT_HDL_module_creator.block.yml
+    OOT_HDL_multiplier_32b.block.yml
+    OOT_HDL_adder.block.yml DESTINATION share/gnuradio/grc/blocks)

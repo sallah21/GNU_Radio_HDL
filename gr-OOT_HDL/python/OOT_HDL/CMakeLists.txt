@@ -24,7 +24,8 @@ gr_python_install(FILES __init__.py
     verilog_parser.py
     YAML_generator.py
     module_creator.py
-    DESTINATION ${GR_PYTHON_DIR}/gnuradio/OOT_HDL)
+    multiplier_32b.py
+    adder.py DESTINATION ${GR_PYTHON_DIR}/gnuradio/OOT_HDL)
 
 ########################################################################
 # Handle the unit tests
@@ -40,3 +41,5 @@ add_custom_target(
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}
             ${PROJECT_BINARY_DIR}/test_modules/gnuradio/OOT_HDL/)
 GR_ADD_TEST(qa_HDL_module ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_HDL_module.py)
+GR_ADD_TEST(qa_multiplier_32b ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_multiplier_32b.py)
+GR_ADD_TEST(qa_adder ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/qa_adder.py)

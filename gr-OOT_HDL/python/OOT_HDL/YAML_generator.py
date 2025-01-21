@@ -53,7 +53,7 @@ file_format: 1
             input_ports_yaml += f'''    -   label: {port.name}
         domain: stream
         dtype: int
-        vlen: {port.size}
+        vlen: 1
 
 '''
 
@@ -63,7 +63,7 @@ file_format: 1
             output_ports_yaml += f'''    -   label: {port.name}
         domain: stream
         dtype: int
-        vlen: {port.size} 
+        vlen: 1
 '''
 
         # Create YAML content with the template
@@ -77,6 +77,15 @@ file_format: 1
 
     def get_yml_content(self):
         return self.yml_content
+
+    def cleanup(self):
+        self.yml_content = ""
+        self.module_name = "default_module_name"
+        self.parameters = {}
+        self.input_ports = []
+        self.output_ports = []
+        self.inout_ports = []
+        pass
 
     def save_to_file(self, filename):
         with open(filename, "w") as f:
