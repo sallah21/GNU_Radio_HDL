@@ -78,6 +78,7 @@ file_format: 1
     def get_yml_content(self):
         return self.yml_content
 
+
     def cleanup(self):
         self.yml_content = ""
         self.module_name = "default_module_name"
@@ -87,9 +88,12 @@ file_format: 1
         self.inout_ports = []
         pass
 
+
     def save_to_file(self, filename):
         with open(filename, "w") as f:
             f.write(self.yml_content)
+
+
 
 if __name__ == "__main__":
     import verilog_parser

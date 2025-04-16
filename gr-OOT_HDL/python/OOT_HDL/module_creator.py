@@ -7,7 +7,6 @@
 #
 TEST_DIR = "/Users/salsamon/Documents/Magisterka"
 
-import numpy
 import os
 from gnuradio import gr
 from .verilog_parser import Verilog_parser, port_type, Port
@@ -24,7 +23,6 @@ class module_creator(gr.basic_block):
         self.parser = Verilog_parser()
         self.generator = yml_generator()
         self.file = None
-        self.actual_file = False
         self.module_name = None
         self.params = None
         self.ports = None
@@ -134,17 +132,11 @@ class {self.module_name}(gr.basic_block):
         output_ports = [port for port in self.ports if port.type == port_type.OUT]
         inout_ports = [port for port in self.ports if port.type == port_type.INOUT] # XXX: Not implemented yet
 
-        # Create new GNU_Radio module
-        # print(f"Module name: {self.module_name}")
-        # print(f"Parameters: {self.params}")
-        # print(f"Ports: {self.ports}")
         print(f"Changing directory to {TEST_DIR}/gr-OOT_HDL/")
         if os.system(f"cd {TEST_DIR}/gr-OOT_HDL/") != 0:
             print("Failed to change directory")
             return
         param_names = ",".join(self.params.keys())
-        # print(f"Param names: {param_names}")
-
         # Check if module already exists
         module_path = f"{TEST_DIR}/gr-OOT_HDL/python/OOT_HDL/{self.module_name}.py"
         module_yml_path = f"{TEST_DIR}/gr-OOT_HDL/grc/OOT_HDL_{self.module_name}.block.yml"
@@ -172,7 +164,6 @@ class {self.module_name}(gr.basic_block):
         else:
             print("Init file not found")
 
-        #
         python_module = self.generate_python_module()
         with open(f"{TEST_DIR}/gr-OOT_HDL/python/OOT_HDL/{self.module_name}.py", "w") as f:
             f.write(python_module)
@@ -200,12 +191,12 @@ class {self.module_name}(gr.basic_block):
             print("Failed to build GNU Radio")
             return
 
-        # print("Running make install")
-        # if os.system(f"cd {TEST_DIR}/gr-OOT_HDL/build && make install") != 0:
-        #     print("Failed to install GNU Radio")
-        #     return
-
+        print("Running make install")
+        if os.system(f"cd {TEST_DIR}/gr-OOT_HDL/build && make install") != 0:
+            print("Failed to install GNU Radio")
+            return
         pass
+
 
     def cleanup(self):
         self.parser.cleanup()
@@ -216,6 +207,7 @@ class {self.module_name}(gr.basic_block):
         self.params = None
         self.ports = None
         pass
+
 
     def general_work(self, filename=None, **kwargs):
         if (filename != self.file and filename != None):
