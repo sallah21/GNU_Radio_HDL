@@ -11,6 +11,7 @@ import os
 from gnuradio import gr
 from .verilog_parser import Verilog_parser, port_type, Port
 from .YAML_generator import yml_generator
+from .model_generator import model_generator
 class module_creator(gr.basic_block):
     """
     docstring for block module_creator
@@ -21,7 +22,8 @@ class module_creator(gr.basic_block):
             in_sig=[],
             out_sig=[])
         self.parser = Verilog_parser()
-        self.generator = yml_generator()
+        self.yml_generator = yml_generator()
+        self.model_generator = model_generator()
         self.file = None
         self.module_name = None
         self.params = None
@@ -152,9 +154,9 @@ class {self.module_name}(gr.basic_block):
             print(f"Module {self.module_name} already exists, skipping gr_modtool add")
 
         print("Generating YAML")
-        self.generator.generate(self.module_name, self.params, input_ports, output_ports)
+        self.yml_generator.generate(self.module_name, self.params, input_ports, output_ports)
         print("YAML generated")
-        self.generator.save_to_file(f"{TEST_DIR}/gr-OOT_HDL/grc/OOT_HDL_{self.module_name}.block.yml")
+        self.yml_generator.save_to_file(f"{TEST_DIR}/gr-OOT_HDL/grc/OOT_HDL_{self.module_name}.block.yml")
         print("YAML saved")
         print("Generating GNU_Radio module")
 
@@ -195,12 +197,18 @@ class {self.module_name}(gr.basic_block):
         if os.system(f"cd {TEST_DIR}/gr-OOT_HDL/build && make install") != 0:
             print("Failed to install GNU Radio")
             return
+        print("Module generated")
+        print("Compiling Verilog module")
         pass
 
 
+    def generate_new_model(self):
+        generated_model = self.model_generator.generate_model(self.file)
+        return generated_model
+
     def cleanup(self):
         self.parser.cleanup()
-        self.generator.cleanup()
+        self.yml_generator.cleanup()
         self.file = None
         self.actual_file = False
         self.module_name = None
