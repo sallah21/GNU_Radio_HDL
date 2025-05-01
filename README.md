@@ -1,3 +1,5 @@
+# OBSOLETE DESCRIPTION
+
 # GNU Radio HDL Integration Project
 
 This project demonstrates the integration of hardware description language (HDL) modules with GNU Radio, enabling signal processing applications to leverage hardware acceleration through custom HDL implementations.
@@ -96,16 +98,19 @@ python untitled.py
 ### C Server
 
 The server listens on port 5000 and processes messages in the format:
+
 ```
 module1:val1,val2,val3;module2:val1,val2;...
 ```
 
 For example, to process data with the adder module:
+
 ```
 adder:2.5,3.7;
 ```
 
 The server will return:
+
 ```
 adder:5.00,7.40;
 ```
