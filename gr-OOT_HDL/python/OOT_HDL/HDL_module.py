@@ -8,7 +8,6 @@
 
 import numpy
 import os
-import socket
 import multiprocessing
 from .verilog_parser import Verilog_parser, port_type, Port
 from .YAML_generator import yml_generator
@@ -38,8 +37,6 @@ class HDL_module(gr.basic_block):
         self.module_name = v_parser.get_module_name()
         self.params = v_parser.get_parameters()
         self.ports = v_parser.get_ports()
-        self.socket = None
-        self.server = None
         
         # Update parameters with values from GNU Radio
         for param_name, default_value in self.params.items():
@@ -76,12 +73,7 @@ class HDL_module(gr.basic_block):
         # Start simulation in a separate process
         self.process = multiprocessing.Process(target=self.start_simulation)
         self.process.start()
-
-        # Start system socket for communication with simulation
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect(('localhost', 12345))
-
-        
+  
         # Generate YAML configuration if it doesn't exist
         yaml_path = os.path.join(os.path.dirname(__file__), 
                                f'{YAML_BLOCK_DIR}/{YAML_BLOCK_FILE}')
@@ -90,10 +82,7 @@ class HDL_module(gr.basic_block):
 
     def start_simulation(self):
         # Compile C server
-        # TODO: support other compilers
-        os.system(f'gcc -o {SERVER_OUTPUT_FILE} {SERVER_C_FILE}')
-        # Start C server
-        self.server = subprocess.Popen([SERVER_OUTPUT_FILE], stdout=subprocess.PIPE)
+        # TODO: use in model class run_model
         pass
 
     def _generate_yaml_config(self, yaml_path):
