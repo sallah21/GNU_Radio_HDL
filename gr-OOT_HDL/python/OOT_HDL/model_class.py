@@ -23,8 +23,9 @@ class model:
         endmodule
         """
         self.module_instance_template = """
-        {module_name} {module_name}_inst
+        {module_name}
         {instance_parameters}
+        {module_name}_inst
         (
             {instance_inputs},
             {instance_outputs}
@@ -83,37 +84,33 @@ class model:
             parameters.append(param)
         parameters = ",\n".join(parameters)
         param_template = param_template.format(params=parameters)
-        print(f"Parameters: {param_template}")
         return param_template
         pass
 
     def generate_instance_parameters(self):
-        # TODO: make it work 
         if self.params is None:
             return ""
         param_template = "#({params})"
         parameters = []
         for param in self.params:
             parameters.append(param)
-        parameters = ",\n".join(parameters)
+        parameters = ",\n".join(f".{param}({param})" for param in parameters)
         param_template = param_template.format(params=parameters)
-        print(f"Instance parameters: {param_template}")
         return param_template
         pass
 
 
     def generate_wrapper(self):
         inputs, outputs, instance_inputs, instance_outputs = self.generate_ports()
-        parameters = self.generate_parameters()
-        instance_parameters = self.generate_instance_parameters()
+        
         instance_wrapper = self.module_instance_template.format(
             module_name=self.module_name,
-            parameters=parameters,
-            instance_parameters=instance_parameters,
+            instance_parameters=self.generate_instance_parameters(),
             instance_inputs=instance_inputs,
             instance_outputs=instance_outputs
         )
         self.wrapper_output = self.wrapper_template.format(
+            parameters=self.generate_parameters(),
             inputs=inputs,
             outputs=outputs,
             module_name=self.module_name,
