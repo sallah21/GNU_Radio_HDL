@@ -71,7 +71,11 @@ class untitled(gr.top_block, Qt.QWidget):
             print(f"Model type: {type(model)}")
             raise Exception("Failed to generate model")
         model.generate_model()
-        model.run_model([1,2])
+        input_data = [1]
+        result = model.run_model(input_data)
+        result = model.run_model([result["data_out"]])
+        result = model.run_model([result["data_out"]])
+        print(f"Result: {result}")
         time.sleep(1)
         model.stop_process()
         

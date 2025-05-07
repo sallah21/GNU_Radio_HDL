@@ -311,19 +311,37 @@ class model:
                     if self.process and self.process.poll() is None:
                         # Format the data for the Verilator model
                         # For Verilator with C++ testbench, we need to set top-level signals
-                        if isinstance(data, list) and len(data) >= 2:
-                            # Here's how Verilator C++ testbench expects commands
-                            # The exact syntax depends on your model but this is common
-                            data_in = int(data[0])
-                            data_in2 = int(data[1])
-                            print(f"Setting data_in={data_in}, data_in2={data_in2}")
+                        if isinstance(data, list) and len(data) > 0:
+                            # Get list of input ports
+                            input_ports = [port for port in self.ports if port.type != port_type.OUT]
                             
-                            # Send command to set inputs (depends on your testbench implementation)
-                            command = f"{data_in} {data_in2}\n"
-                            self.process.stdin.write(command.encode())
-                            self.process.stdin.flush()
+                            # Validate data length matches number of input ports
+                            if len(data) == len(input_ports):
+                                # Build command dynamically based on available inputs
+                                command_parts = []
+                                
+                                # Log for debugging
+                                log_parts = []
+                                
+                                # Process each input port with corresponding data
+                                for i, port in enumerate(input_ports):
+                                    # Convert input according to port specifications
+                                    # This might need adjustment based on actual port types
+                                    value = int(data[i])
+                                    command_parts.append(str(value))
+                                    log_parts.append(f"{port.name}={value}")
+                                
+                                # Create the command string with all inputs
+                                command = " ".join(command_parts) + "\n"
+                                print(f"Setting {', '.join(log_parts)}")
+                                
+                                # Send the command to the process
+                                self.process.stdin.write(command.encode())
+                                self.process.stdin.flush()
+                            else:
+                                print(f"Warning: Invalid data length. Expected {len(input_ports)} inputs for ports {[port.name for port in input_ports]}, got {len(data)} values: {data}")
                         else:
-                            print(f"Warning: Invalid data format. Expected [data_in, data_in2], got {data}")
+                            print(f"Warning: Invalid data format. Expected a list of values, got {data}")
                 time.sleep(0.01)
             except Exception as e:
                 print(f"Input thread error: {e}")
