@@ -6,10 +6,13 @@ import threading
 import queue
 import time
 
+
 class model:
     def __init__(self, model_file, output_dir):
         self.input_queue = queue.Queue()
-        self.output_queue = queue.Queue()
+        self.process_output_queue = queue.Queue()
+        self.data_ready = threading.Event()
+        self.data = None
         self.running = False
         self.input_thread = None
         self.output_thread = None
@@ -282,13 +285,13 @@ class model:
 
 
     def _processing_thread(self):
-        print("Processing thread started")
+        # print("Processing thread started")
         while self.running:
             try:
                 if self.process and self.process.poll() is None:
                     line = self.process.stdout.readline().decode().strip()
                     if line:
-                        self.output_queue.put(line)
+                        self.process_output_queue.put(line)
                 else:
                     # Only sleep if we're not actively reading
                     time.sleep(0.01)
@@ -331,9 +334,10 @@ class model:
     def _output_thread(self):
         while self.running:
             try:
-                if not self.output_queue.empty():
-                    data = self.output_queue.get()
-                    print(f"Output data: {data}")
+                if not self.process_output_queue.empty():
+                    self.data = self.process_output_queue.get()
+                    self.data_ready.set()
+                    # print(f"Output data: {self.data}")
             except Exception as e:
                 print(f"Output thread error: {e}")
             time.sleep(0.01)
@@ -341,8 +345,14 @@ class model:
 
 
     def run_model(self,data):
+        self.data_ready.clear()
         self.input_queue.put(data)
-        pass
+        # Wait for the output thread to process the data
+        self.data_ready.wait()
+        result_dict = {}
+        data = self.data.split("=")
+        result_dict[data[0]] = data[1]
+        return result_dict
 
 
     def stop_process(self):
