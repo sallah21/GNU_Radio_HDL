@@ -1,6 +1,6 @@
 # Model class
 import subprocess
-from verilog_parser import Port, port_type, Verilog_parser
+from .verilog_parser import Port, port_type, Verilog_parser
 import os
 import threading
 import queue
@@ -32,9 +32,6 @@ class model:
             {outputs}
         );
         {model_instance}
-        always @({always_at}) begin
-            $display({outputs_print});
-        end
         endmodule
         """
         self.module_instance_template = """
@@ -139,9 +136,7 @@ class model:
             inputs=self.inputs,
             outputs=self.outputs,
             module_name=self.module_name,
-            model_instance=instance_wrapper,
-            always_at=self.generate_always_at(),
-            outputs_print=self.generate_display()
+            model_instance=instance_wrapper
         )
         pass
 
@@ -181,7 +176,7 @@ class model:
                 output_parts.append(f'<< "{port.name}=" << top->{port.name} ')
             
             output_print = " ".join(output_parts)
-            output_printing.append(f'            std::cout << "OUTPUT_CHANGE: " {output_print}<< std::endl;')
+            output_printing.append(f'            std::cout {output_print}<< std::endl;')
         
         # Dynamically generate a custom C++ testbench for the model based on its ports
         cpp_testbench_template = """
@@ -250,16 +245,20 @@ class model:
             cpp_testbench_file,
             *parameters_values
         ]
-        print(f"cmd_compile: {cmd_compile} \n")
-        subprocess.run(cmd_compile, check=True)
+        try:
+            # print(f"cmd_compile: {cmd_compile} \n")
+            subprocess.run(cmd_compile, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except subprocess.CalledProcessError as e:
+            print(f"Error compiling Verilator model: {e}")
+            return
         
         cmd_make = [
             "make", 
             "-C", os.path.join(self.output_dir, f"{self.module_name}_obj_dir"),
             "-f", f"V{self.module_name}_wrapper.mk"
         ]
-        print(f"cmd_make: {cmd_make} \n")
-        subprocess.run(cmd_make, check=True)
+        # print(f"cmd_make: {cmd_make} \n")
+        subprocess.run(cmd_make, check=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         
         self.exe_file = os.path.join(self.output_dir, f"{self.module_name}_obj_dir", f"V{self.module_name}_wrapper")
         pass
@@ -275,7 +274,8 @@ class model:
 
 
     def dump_wrapper(self):
-        with open(f"{self.module_name}_wrapper.v", "w") as f:
+        print(f"Wrapper output path: {os.path.join(self.output_dir, f"{self.module_name}_wrapper.v")}")
+        with open(os.path.join(self.output_dir, f"{self.module_name}_wrapper.v"), "w") as f:
             f.write(self.wrapper_output)
         self.model_file_wrapper = os.path.join(self.output_dir, f"{self.module_name}_wrapper.v")
         pass
@@ -288,10 +288,7 @@ class model:
                 if self.process and self.process.poll() is None:
                     line = self.process.stdout.readline().decode().strip()
                     if line:
-                        print(f"Read from process: {line}")
-                        if "OUTPUT_CHANGE:" in line:
-                            print(f"Processing: {line}")
-                            self.output_queue.put(line)
+                        self.output_queue.put(line)
                 else:
                     # Only sleep if we're not actively reading
                     time.sleep(0.01)
@@ -387,7 +384,7 @@ class model:
          stdin=subprocess.PIPE, 
          stdout=subprocess.PIPE, 
          stderr=subprocess.PIPE)
-        print(f"Process started: {self.process}")
+        # print(f"Process started: {self.process}")
         self.input_thread = threading.Thread(target=self._input_thread)
         self.input_thread.daemon = True
         self.input_thread.start()
@@ -395,11 +392,11 @@ class model:
         self.processing_thread = threading.Thread(target=self._processing_thread)
         self.processing_thread.daemon = True
         self.processing_thread.start()
-        print(f"Input thread started: {self.input_thread}")
+        # print(f"Input thread started: {self.input_thread}")
         self.output_thread = threading.Thread(target=self._output_thread)
         self.output_thread.daemon = True
         self.output_thread.start()
-        print(f"Output thread started: {self.output_thread}")
+        # print(f"Output thread started: {self.output_thread}")
         pass
 
     def generate_model(self):

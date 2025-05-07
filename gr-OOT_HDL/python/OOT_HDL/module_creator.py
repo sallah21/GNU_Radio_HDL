@@ -197,14 +197,18 @@ class {self.module_name}(gr.basic_block):
         if os.system(f"cd {TEST_DIR}/gr-OOT_HDL/build && make install") != 0:
             print("Failed to install GNU Radio")
             return
+        print("Generating model")
+
+    
+    def generate_model(self, file=None):
+        if file is None:
+            file = self.file
+        generated_model = self.model_generator.generate_model(file, TEST_DIR)
+        if generated_model is None:
+            raise Exception("Failed to generate model")
         print("Module generated")
-        print("Compiling Verilog module")
-        pass
-
-
-    def generate_new_model(self):
-        generated_model = self.model_generator.generate_model(self.file)
         return generated_model
+
 
     def cleanup(self):
         self.parser.cleanup()
@@ -218,15 +222,33 @@ class {self.module_name}(gr.basic_block):
 
 
     def general_work(self, filename=None, **kwargs):
-        if (filename != self.file and filename != None):
-            self.cleanup()
-            print("File changed")
-            self.file = filename
-            print("Changing module")
+        self.cleanup()
+        print("File changed")
+        self.file = filename
+        
+        if not filename or not os.path.exists(filename):
+            print(f"Error: File {filename} does not exist")
+            return None
+            
+        print("Changing module")
+        try:
             self.parser.change_module(filename)
-            self.generate_new_module()
-        else: 
-            print(f"File not changed: {filename} == {self.file}") 
-            print("File not changed")
-            pass
-        pass
+            self.ports = self.parser.get_ports()
+            self.params = self.parser.get_parameters()
+            self.module_name = self.parser.get_module_name()
+            
+            if not self.module_name:
+                print("Error: Could not determine module name")
+                return None
+                
+            print(f"Module name: {self.module_name}")
+            print(f"Ports: {len(self.ports) if self.ports else 0}")
+            print(f"Parameters: {len(self.params) if self.params else 0}")
+            
+            # Generate new module and model
+            return self.generate_new_module()
+        except Exception as e:
+            print(f"Error processing module: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return None

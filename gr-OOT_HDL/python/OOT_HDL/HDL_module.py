@@ -12,8 +12,6 @@ import multiprocessing
 from .verilog_parser import Verilog_parser, port_type, Port
 from .YAML_generator import yml_generator
 from gnuradio import gr
-SERVER_C_FILE="/Users/salsamon/Documents/Magisterka/serwer.c"
-SERVER_OUTPUT_FILE="/Users/salsamon/Documents/Magisterka/serwer.out"
 YAML_BLOCK_DIR="/Users/salsamon/radioconda/share/gnuradio/grc/blocks"
 YAML_BLOCK_FILE="OOT_HDL_HDL_module.block.yml"
 class HDL_module(gr.basic_block):
@@ -70,10 +68,10 @@ class HDL_module(gr.basic_block):
             in_sig=[(numpy.int32, vlen) for vlen in in_sigs],
             out_sig=[(numpy.int32, vlen) for vlen in out_sigs])
         
-        # Start simulation in a separate process
-        self.process = multiprocessing.Process(target=self.start_simulation)
-        self.process.start()
-  
+
+        self.model= model_generator(self.file, './')
+
+
         # Generate YAML configuration if it doesn't exist
         yaml_path = os.path.join(os.path.dirname(__file__), 
                                f'{YAML_BLOCK_DIR}/{YAML_BLOCK_FILE}')
@@ -81,8 +79,7 @@ class HDL_module(gr.basic_block):
             self._generate_yaml_config(yaml_path)
 
     def start_simulation(self):
-        # Compile C server
-        # TODO: use in model class run_model
+        self.model.generate_model()
         pass
 
     def _generate_yaml_config(self, yaml_path):
@@ -105,9 +102,42 @@ class HDL_module(gr.basic_block):
         return ninput_items_required
 
     def general_work(self, input_items, output_items):
-        # For this sample code, the general block is made to behave like a sync block
+        # Process samples through HDL model
         ninput_items = min([len(items) for items in input_items])
         noutput_items = min(len(output_items[0]), ninput_items)
-        output_items[0][:noutput_items] = input_items[0][:noutput_items]
+        
+        # Process samples one by one
+        for i in range(noutput_items):
+            # Collect input data from all input ports
+            input_data = []
+            for j in range(len(input_items)):
+                input_data.append(int(input_items[j][i]))
+            
+            # Send input data to the model
+            self.model.run_model(input_data)
+            
+            # Wait a short time for processing (can be optimized)
+            import time
+            time.sleep(0.01)
+            
+            # Check for output in the output queue
+            if not self.model.output_queue.empty():
+                # Parse the output result from the output queue
+                output_str = self.model.output_queue.get()
+                
+                # Extract the actual value from the output string
+                # Assuming format like "OUTPUT_CHANGE: data_out= 3"
+                try:
+                    value_str = output_str.split("=")[1].strip()
+                    output_value = int(value_str)
+                    output_items[0][i] = output_value
+                except (IndexError, ValueError) as e:
+                    print(f"Error parsing output: {output_str}, {e}")
+                    output_items[0][i] = 0  # Default value on error
+            else:
+                # No output available yet, use a default value
+                output_items[0][i] = 0
+        
+        # Tell GNU Radio how many items were consumed
         self.consume_each(noutput_items)
         return noutput_items

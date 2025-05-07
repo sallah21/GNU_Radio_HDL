@@ -163,3 +163,4 @@ cython_debug/
 
 
 obj_dir/
+*obj_dir*

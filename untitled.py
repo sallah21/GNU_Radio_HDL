@@ -66,30 +66,15 @@ class untitled(gr.top_block, Qt.QWidget):
 
         self.OOT_HDL_module_creator_0 = OOT_HDL.module_creator()
         print("Module creator created")
-        print("First work step")
-        self.OOT_HDL_module_creator_0.general_work()
-        print("Second work step")
-        self.OOT_HDL_module_creator_0.general_work()
-        print("Third work step with setting file")
-        self.OOT_HDL_module_creator_0.general_work("/Users/salsamon/Documents/Magisterka/multiplier.v")
-        print("Fourth work step")
-        self.OOT_HDL_module_creator_0.general_work("/Users/salsamon/Documents/Magisterka/multiplier.v")
-        print("Fifth work step")
-        self.OOT_HDL_module_creator_0.general_work("/Users/salsamon/Documents/Magisterka/multiplier.v")
-        print("Sixth work step with file changed")
-        self.OOT_HDL_module_creator_0.general_work("/Users/salsamon/Documents/Magisterka/adder.v")
-        print("Seventh work step")
-        self.OOT_HDL_module_creator_0.general_work("/Users/salsamon/Documents/Magisterka/adder.v")
-        print("Eighth work step")
-        self.OOT_HDL_module_creator_0.general_work("/Users/salsamon/Documents/Magisterka/adder.v")
-        print("Ninth work step")
-        self.OOT_HDL_module_creator_0.general_work("/Users/salsamon/Documents/Magisterka/adder.v")
-        print("Tenth work step")
-        self.OOT_HDL_module_creator_0.general_work("/Users/salsamon/Documents/Magisterka/adder.v")
+        model = self.OOT_HDL_module_creator_0.generate_model("/Users/salsamon/Documents/Magisterka/multiplier.v")
+        if model is None:
+            print(f"Model type: {type(model)}")
+            raise Exception("Failed to generate model")
+        model.generate_model()
+        model.run_model([1,2])
+        time.sleep(1)
+        model.stop_process()
         
-
-        # Testing server
-        self.adder_0 = OOT_HDL.adder(1,2,3)
         time.sleep(10)
         print("SIM DONE")
         ##################################################

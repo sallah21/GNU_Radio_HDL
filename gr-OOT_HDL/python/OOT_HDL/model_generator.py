@@ -1,8 +1,6 @@
 # Class for generating and handling C++ generated models from verilator 
 import os 
-import subprocess
-from model_class import model
-from verilog_parser import Port, port_type
+from .model_class import model
 import time
 
 class model_generator:
@@ -16,7 +14,9 @@ class model_generator:
             return
         self.hdl_file = hdl_file
         # Check if verilator is installed
-        if os.system("verilator --version") != 0:
+        try:
+            os.system("verilator --version")
+        except:
             print("Verilator is not installed")
             return
         # Check if HDL file exists
