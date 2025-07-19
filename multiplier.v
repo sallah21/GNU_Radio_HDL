@@ -1,8 +1,8 @@
-module multiplier_32b
+module multiplier
 #(
-    parameter dupa,
-    parameter int dupa2,
-    parameter [9:0] dupa3 = ;
+    parameter dupa =10,
+    parameter int dupa2 =10,
+    parameter [9:0] dupa3 = 10
 )
 (
     input wire [31:0] data_in,
