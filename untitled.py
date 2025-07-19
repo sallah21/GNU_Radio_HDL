@@ -71,19 +71,23 @@ class untitled(gr.top_block, Qt.QWidget):
             print(f"Model type: {type(model)}")
             raise Exception("Failed to generate model")
         model.generate_model()
-        reset = 1
+        reset = 0
         clock = 0
         input = 1
         input_data = [input, clock, reset]
         result = model.run_model(input_data)
         print(f"Result: {result}")
-        # clock = 1
+        clock = 1
         input_data = [input, clock, reset]
         result = model.run_model(input_data)
         print(f"Result: {result}")
-        # clock = 0
+        clock = 0
+        # Explicitly wait for 5 clock cycles
+        model.wait_n_cycles(5)
         input_data = [result["data_out"], clock, reset]
-        # clock = 1
+        result = model.run_model(input_data)
+        clock = 1
+        result = model.run_model(input_data)
         input_data = [result["data_out"], clock, reset]
         result = model.run_model(input_data)
         print(f"Result: {result}")
