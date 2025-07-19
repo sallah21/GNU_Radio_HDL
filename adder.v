@@ -1,8 +1,8 @@
 module adder
 #(
-    parameter dupa,
-    parameter int dupa2,
-    parameter [9:0] dupa3 = ;
+    parameter dupa=1,
+    parameter int dupa2=5,
+    parameter [9:0] dupa3 = 10'h3
 )
 (
     input wire [31:0] data_in,

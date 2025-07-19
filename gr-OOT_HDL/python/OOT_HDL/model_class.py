@@ -26,6 +26,8 @@ class model:
         self.process = None
         self.exe_file = None
         self.model_file_wrapper = None
+        self.has_clock = None
+
         # Verilog wrapper for returning output values
         self.wrapper_template = """
         module {module_name}_wrapper
@@ -49,20 +51,43 @@ class model:
         self.wrapper_output = None
         pass
 
-    # Get model file
+    def detect_clock_signals(self):
+        """Detect if module uses clock signals"""
+        clock_patterns = ['clk', 'clock', 'CLK', 'CLOCK']
+        self.has_clock = False
+        self.clock_ports = []
+        if self.ports is None:
+            return False
+        for port in self.ports:
+            if any(pattern in port.name for pattern in clock_patterns):
+                self.has_clock = True
+                self.clock_ports.append(port)
+        return self.has_clock
+
+    def wait_n_cycles(self, n):
+        """Wait for n clock cycles"""
+        if self.has_clock:  
+            pass
+        else:
+            raise Exception("Model does not have clock ports")
+
     def get_model_file(self):
+        """Get model file"""
         return self.model_file
 
-    # Get output directory
     def get_output_dir(self):
+        """Get output directory"""
         return self.output_dir
 
     def generate_ports(self):
+        """Generate ports for template replacement"""
         port_type_map = {
             port_type.IN: "input",
             port_type.OUT: "output",
             port_type.INOUT: "inout"
         }
+        self.has_clock = self.detect_clock_signals()
+        print(f"Has clock ports: {self.has_clock}")
         # Generate inputs and outputs for template replacement
         inputs = ",\n ".join([f" {port_type_map[port.type]} [{port.size-1}:0] {port.name}" for port in self.ports if port.type != port_type.OUT])
         outputs = ",\n ".join([f" {port_type_map[port.type]} [{port.size-1}:0] {port.name}" for port in self.ports if port.type == port_type.OUT])
@@ -79,6 +104,7 @@ class model:
 
 
     def generate_display(self):
+        """Generate display for template replacement"""
         display_parts = []
         for port in self.ports:
             if port.type == port_type.OUT:
@@ -91,6 +117,7 @@ class model:
 
 
     def generate_parameters(self):
+        """Generate parameters for template replacement"""
         if self.params is None:
             return ""
         param_template = "#(\n{params}\n)\n"
@@ -103,6 +130,7 @@ class model:
 
 
     def generate_instance_parameters(self):
+        """Generate instance parameters for template replacement"""
         if self.params is None:
             return ""
         param_template = "#({params})"
@@ -115,6 +143,7 @@ class model:
 
 
     def generate_always_at(self):
+        """Generate always at for template replacement"""
         if self.ports is None:
             return ""
         ports = []
@@ -125,6 +154,7 @@ class model:
         return ports
 
     def generate_wrapper(self):
+        """Generate wrapper for template replacement"""
         inputs, outputs, instance_inputs, instance_outputs = self.generate_ports()
         self.inputs = inputs
         self.outputs = outputs
@@ -144,6 +174,7 @@ class model:
         pass
 
     def compile_model(self):
+        """Compile model with verilator"""
         parameters_values = []
         # TODO: add parameters values passing 
         for param in self.params:
@@ -161,7 +192,7 @@ class model:
         
         # Generate input parsing code
         if input_ports:
-            input_var_declarations = ", ".join([f"int {port.name} = 0" for port in input_ports])
+            input_var_declarations = "; ".join([f"int {port.name} = 0" for port in input_ports])
             input_declarations.append(f"        {input_var_declarations};")
             
             input_scanf_format = " ".join(["%d" for _ in input_ports])
@@ -204,9 +235,8 @@ class model:
         {input_declarations_code}
         {input_parsing_code}
         {input_setting_code}
-                    
                     // Evaluate model (run one clock cycle)
-                    top->eval();
+        {eval_statement}
                     
                     // Print output value (this will be captured by our processing thread)
         {output_printing_code}
@@ -221,6 +251,19 @@ class model:
             return 0;
         }}
         """
+        eval_statement = None 
+
+        if self.has_clock:
+            eval_statement = """
+                    # // Clock cycle simulation
+                    # top->clk = 0;
+                    # top->eval();
+            
+                    # top->clk = 1;
+                    top->eval();
+            """
+        else:
+            eval_statement = "            top->eval();"
         
         # Create the testbench file with dynamic port handling
         cpp_testbench_content = cpp_testbench_template.format(
@@ -228,7 +271,8 @@ class model:
             input_declarations_code="\n".join(input_declarations),
             input_parsing_code="\n".join(input_parsing),
             input_setting_code="\n".join(input_setting),
-            output_printing_code="\n".join(output_printing)
+            output_printing_code="\n".join(output_printing),
+            eval_statement=eval_statement   
         )
         
         cpp_testbench_file = os.path.join(self.output_dir, f"{self.module_name}_testbench.cpp")
@@ -345,6 +389,7 @@ class model:
                 time.sleep(0.01)
             except Exception as e:
                 print(f"Input thread error: {e}")
+                exit(1)
                 
         pass
 
@@ -408,6 +453,7 @@ class model:
 
     def start_process(self):
         self.running = True
+        print(f"Starting process: {self.exe_file}")
         self.process = subprocess.Popen([self.exe_file],
          stdin=subprocess.PIPE, 
          stdout=subprocess.PIPE, 

@@ -10,7 +10,6 @@ The project consists of several key components:
 
 1. **GNU Radio Out-of-Tree Module (gr-OOT_HDL)**: A custom GNU Radio module that provides blocks for interfacing with HDL implementations.
 2. **HDL Modules**: Verilog implementations of signal processing functions (adder, multiplier).
-3. **C Server**: A TCP server that acts as a bridge between GNU Radio and the HDL modules.
 
 ## Directory Structure
 
@@ -51,11 +50,6 @@ sudo make install
 sudo ldconfig
 ```
 
-### Compiling the C Server
-
-```bash
-gcc -o hdl_server server.c
-```
 
 ## Running the Project
 

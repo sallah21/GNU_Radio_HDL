@@ -27,26 +27,26 @@ class untitled(gr.top_block, Qt.QWidget):
 
     def __init__(self):
         gr.top_block.__init__(self, "Not titled yet", catch_exceptions=True)
-        Qt.QWidget.__init__(self)
-        self.setWindowTitle("Not titled yet")
-        qtgui.util.check_set_qss()
-        try:
-            self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
-        except BaseException as exc:
-            print(f"Qt GUI: Could not set Icon: {str(exc)}", file=sys.stderr)
-        self.top_scroll_layout = Qt.QVBoxLayout()
-        self.setLayout(self.top_scroll_layout)
-        self.top_scroll = Qt.QScrollArea()
-        self.top_scroll.setFrameStyle(Qt.QFrame.NoFrame)
-        self.top_scroll_layout.addWidget(self.top_scroll)
-        self.top_scroll.setWidgetResizable(True)
-        self.top_widget = Qt.QWidget()
-        self.top_scroll.setWidget(self.top_widget)
-        self.top_layout = Qt.QVBoxLayout(self.top_widget)
-        self.top_grid_layout = Qt.QGridLayout()
-        self.top_layout.addLayout(self.top_grid_layout)
+        # Qt.QWidget.__init__(self)
+        # self.setWindowTitle("Not titled yet")
+        # qtgui.util.check_set_qss()
+        # try:
+        #     self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
+        # except BaseException as exc:
+        #     print(f"Qt GUI: Could not set Icon: {str(exc)}", file=sys.stderr)
+        # self.top_scroll_layout = Qt.QVBoxLayout()
+        # self.setLayout(self.top_scroll_layout)
+        # self.top_scroll = Qt.QScrollArea()
+        # self.top_scroll.setFrameStyle(Qt.QFrame.NoFrame)
+        # self.top_scroll_layout.addWidget(self.top_scroll)
+        # self.top_scroll.setWidgetResizable(True)
+        # self.top_widget = Qt.QWidget()
+        # self.top_scroll.setWidget(self.top_widget)
+        # self.top_layout = Qt.QVBoxLayout(self.top_widget)
+        # self.top_grid_layout = Qt.QGridLayout()
+        # self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "untitled")
+        # self.settings = Qt.QSettings("GNU Radio", "untitled")
 
         try:
             geometry = self.settings.value("geometry")
@@ -66,25 +66,36 @@ class untitled(gr.top_block, Qt.QWidget):
 
         self.OOT_HDL_module_creator_0 = OOT_HDL.module_creator()
         print("Module creator created")
-        model = self.OOT_HDL_module_creator_0.generate_model("/Users/salsamon/Documents/Magisterka/multiplier.v")
+        model = self.OOT_HDL_module_creator_0.generate_model("/Users/salsamon/Documents/Magisterka/multiplier_clk.sv")
         if model is None:
             print(f"Model type: {type(model)}")
             raise Exception("Failed to generate model")
         model.generate_model()
-        input_data = [1]
+        reset = 1
+        clock = 0
+        input = 1
+        input_data = [input, clock, reset]
         result = model.run_model(input_data)
-        result = model.run_model([result["data_out"]])
-        result = model.run_model([result["data_out"]])
+        print(f"Result: {result}")
+        # clock = 1
+        input_data = [input, clock, reset]
+        result = model.run_model(input_data)
+        print(f"Result: {result}")
+        # clock = 0
+        input_data = [result["data_out"], clock, reset]
+        # clock = 1
+        input_data = [result["data_out"], clock, reset]
+        result = model.run_model(input_data)
         print(f"Result: {result}")
         time.sleep(1)
         model.stop_process()
         
-        time.sleep(10)
+        time.sleep(5)
         print("SIM DONE")
         ##################################################
         # Connections
         ##################################################
-        # self.connect((self.multiplier_0, 0), (self.multiplier_0, 0))
+        # self.connect((self.multiplier_0, 0), (self.multiplier_0, 0)) 
 
 
     def closeEvent(self, event):
@@ -106,13 +117,13 @@ class untitled(gr.top_block, Qt.QWidget):
 
 def main(top_block_cls=untitled, options=None):
 
-    qapp = Qt.QApplication(sys.argv)
+    # qapp = Qt.QApplication(sys.argv)
 
     tb = top_block_cls()
 
     tb.start()
 
-    tb.show()
+    # tb.show()
 
     def sig_handler(sig=None, frame=None):
         tb.stop()
@@ -123,11 +134,11 @@ def main(top_block_cls=untitled, options=None):
     signal.signal(signal.SIGINT, sig_handler)
     signal.signal(signal.SIGTERM, sig_handler)
 
-    timer = Qt.QTimer()
-    timer.start(500)
-    timer.timeout.connect(lambda: None)
+    # timer = Qt.QTimer()
+    # timer.start(500)
+    # timer.timeout.connect(lambda: None)
 
-    qapp.exec_()
+    # qapp.exec_()
 
 if __name__ == '__main__':
     main()
