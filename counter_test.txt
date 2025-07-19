@@ -1,0 +1,121 @@
+Verilator 5.036 2025-04-27 rev UNKNOWN.REV
+=== wait_n_cycles() Test Suite ===
+
+Module creator created
+Module generated
+Has clock ports: True
+Wrapper output path: /Users/salsamon/Documents/Magisterka/counter_wrapper.v
+Starting process: /Users/salsamon/Documents/Magisterka/counter_obj_dir/Vcounter_wrapper
+1. Testing basic counter functionality...
+Input data: [0, 1, 0]
+Log parts: ['clk=0', 'rst=1', 'enable=0']
+Setting clk=0, rst=1, enable=0
+   After reset: count = 0
+Input data: [0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'enable=0']
+Setting clk=0, rst=0, enable=0
+   Reset released: count = 0
+
+2. Testing manual clock control...
+Input data: [1, 0, 1]
+Log parts: ['clk=1', 'rst=0', 'enable=1']
+Setting clk=1, rst=0, enable=1
+   Manual cycle 1: count = 1
+Input data: [0, 0, 1]
+Log parts: ['clk=0', 'rst=0', 'enable=1']
+Setting clk=0, rst=0, enable=1
+Input data: [1, 0, 1]
+Log parts: ['clk=1', 'rst=0', 'enable=1']
+Setting clk=1, rst=0, enable=1
+   Manual cycle 2: count = 2
+Input data: [0, 0, 1]
+Log parts: ['clk=0', 'rst=0', 'enable=1']
+Setting clk=0, rst=0, enable=1
+Input data: [1, 0, 1]
+Log parts: ['clk=1', 'rst=0', 'enable=1']
+Setting clk=1, rst=0, enable=1
+   Manual cycle 3: count = 3
+Input data: [0, 0, 1]
+Log parts: ['clk=0', 'rst=0', 'enable=1']
+Setting clk=0, rst=0, enable=1
+
+3. Testing wait_n_cycles() functionality...
+   Current count before wait_n_cycles(): 3
+   Calling wait_n_cycles(5)...
+Waiting for 5 clock cycles...
+Clock cycles completed: 5
+Input data: [0, 0, 1]
+Log parts: ['clk=0', 'rst=0', 'enable=1']
+Setting clk=0, rst=0, enable=1
+   Count after wait_n_cycles(5): 8
+   Time taken: 0.000 seconds
+   ✅ SUCCESS: Count increased by exactly 5 cycles (3 → 8)
+
+4. Testing different cycle counts...
+   Testing wait_n_cycles(1)...
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 1]
+Log parts: ['clk=0', 'rst=0', 'enable=1']
+Setting clk=0, rst=0, enable=1
+   ✅ wait_n_cycles(1): 8 → 9 (time: 0.000s)
+   Testing wait_n_cycles(3)...
+Waiting for 3 clock cycles...
+Clock cycles completed: 3
+Input data: [0, 0, 1]
+Log parts: ['clk=0', 'rst=0', 'enable=1']
+Setting clk=0, rst=0, enable=1
+   ✅ wait_n_cycles(3): 9 → 12 (time: 0.000s)
+   Testing wait_n_cycles(10)...
+Waiting for 10 clock cycles...
+Clock cycles completed: 10
+Input data: [0, 0, 1]
+Log parts: ['clk=0', 'rst=0', 'enable=1']
+Setting clk=0, rst=0, enable=1
+   ✅ wait_n_cycles(10): 12 → 22 (time: 0.000s)
+
+5. Testing with counter disabled...
+Input data: [0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'enable=0']
+Setting clk=0, rst=0, enable=0
+   Counter disabled, current count: 22
+   Calling wait_n_cycles(3) with counter disabled...
+Waiting for 3 clock cycles...
+Clock cycles completed: 3
+Input data: [0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'enable=0']
+Setting clk=0, rst=0, enable=0
+   ✅ SUCCESS: Count unchanged when disabled (22 → 22)
+
+6. Performance test...
+Input data: [0, 0, 1]
+Log parts: ['clk=0', 'rst=0', 'enable=1']
+Setting clk=0, rst=0, enable=1
+Waiting for 5 clock cycles...
+Clock cycles completed: 5
+Waiting for 5 clock cycles...
+Clock cycles completed: 5
+Waiting for 5 clock cycles...
+Clock cycles completed: 5
+   wait_n_cycles(5): avg time = 0.000s (samples: 3)
+Waiting for 10 clock cycles...
+Clock cycles completed: 10
+Waiting for 10 clock cycles...
+Clock cycles completed: 10
+Waiting for 10 clock cycles...
+Clock cycles completed: 10
+   wait_n_cycles(10): avg time = 0.000s (samples: 3)
+Waiting for 20 clock cycles...
+Clock cycles completed: 20
+Waiting for 20 clock cycles...
+Clock cycles completed: 20
+Waiting for 20 clock cycles...
+Clock cycles completed: 20
+   wait_n_cycles(20): avg time = 0.000s (samples: 3)
+Stopping process...
+Waiting for threads to finish...
+Terminating process...
+Processing thread stopped
+Model process stopped
+
+=== Test Complete ===

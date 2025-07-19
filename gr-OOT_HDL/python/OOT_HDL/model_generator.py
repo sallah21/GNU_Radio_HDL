@@ -25,7 +25,6 @@ class model_generator:
             return
         
         model_instance = model(self.hdl_file, output_dir)
-        # model_instance.generate_model()
         return model_instance
 
 

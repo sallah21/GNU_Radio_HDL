@@ -12,6 +12,8 @@ class model:
         self.input_queue = queue.Queue()
         self.process_output_queue = queue.Queue()
         self.data_ready = threading.Event()
+        self.wait_cycles_complete = threading.Event()  # Event for wait_n_cycles synchronization
+        self.expected_cycles = 0  # Track expected number of cycles
         self.data = None
         self.running = False
         self.input_thread = None
@@ -66,10 +68,38 @@ class model:
 
     def wait_n_cycles(self, n):
         """Wait for n clock cycles"""
-        if self.has_clock:  
-            pass
-        else:
+        if not self.has_clock:
             raise Exception("Model does not have clock ports")
+        
+        if not self.process or self.process.poll() is not None:
+            raise Exception("Model process is not running")
+        
+        # Send special command to wait for n clock cycles
+        # Format: "WAIT_CYCLES <n>\n"
+        command = f"WAIT_CYCLES {n}\n"
+        print(f"Waiting for {n} clock cycles...")
+        
+        try:
+            # Set up synchronization before sending command
+            self.expected_cycles = n
+            self.wait_cycles_complete.clear()
+            
+            # Send the command
+            self.process.stdin.write(command.encode())
+            self.process.stdin.flush()
+            
+            # Wait for the event to be set by the processing thread
+            # This is much more efficient than busy waiting
+            if self.wait_cycles_complete.wait(timeout=10.0):
+                print(f"Clock cycles completed: {n}")
+                return
+            else:
+                raise Exception(f"Timeout waiting for {n} clock cycles to complete")
+            
+        except Exception as e:
+            print(f"Error sending wait_n_cycles command: {e}")
+            raise
+
 
     def get_model_file(self):
         """Get model file"""
@@ -207,7 +237,7 @@ class model:
             output_parts = []
             for port in output_ports:
                 # Fix: Use stream insertion operator (<<) instead of comma
-                output_parts.append(f'<< "{port.name}=" << top->{port.name} ')
+                output_parts.append(f'<< "{port.name}=" << (int) top->{port.name} ')
             
             output_print = " ".join(output_parts)
             output_printing.append(f'            std::cout {output_print}<< std::endl;')
@@ -217,6 +247,7 @@ class model:
         // Automatically generated testbench for {module_name}
         #include <iostream>
         #include <string>
+        #include <sstream>
         #include "V{module_name}_wrapper.h"
         #include "verilated.h"
 
@@ -231,7 +262,23 @@ class model:
             // Process input/output in a loop
             std::string line;
             while (std::getline(std::cin, line)) {{
-                // Parse input values
+                // Check for special WAIT_CYCLES command
+                if (line.find("WAIT_CYCLES") == 0) {{
+                    std::istringstream iss(line);
+                    std::string command;
+                    int cycles;
+                    if (iss >> command >> cycles) {{
+                        // Execute n clock cycles for clocked modules
+                        for (int i = 0; i < cycles; i++) {{
+                            {clock_cycle_code}
+                        }}
+                        std::cout << "WAIT_CYCLES_COMPLETE: " << cycles << std::endl;
+                        std::cout.flush();
+                    }}
+                    continue;
+                }}
+                
+                // Parse regular input values
         {input_declarations_code}
         {input_parsing_code}
         {input_setting_code}
@@ -247,23 +294,30 @@ class model:
             // Clean up
             top->final();
             delete top;
-            
             return 0;
         }}
         """
+
         eval_statement = None 
 
         if self.has_clock:
             eval_statement = """
-                    # // Clock cycle simulation
-                    # top->clk = 0;
-                    # top->eval();
+                    // Clock cycle simulation
+                    //top->clk = 0;
+                    //top->eval();
             
-                    # top->clk = 1;
+                    //top->clk = 1;
                     top->eval();
             """
         else:
             eval_statement = "            top->eval();"
+
+        clock_cycle_code = """
+                    top->clk = 0;
+                    top->eval();
+                    top->clk = 1;
+                    top->eval();
+        """
         
         # Create the testbench file with dynamic port handling
         cpp_testbench_content = cpp_testbench_template.format(
@@ -272,7 +326,8 @@ class model:
             input_parsing_code="\n".join(input_parsing),
             input_setting_code="\n".join(input_setting),
             output_printing_code="\n".join(output_printing),
-            eval_statement=eval_statement   
+            eval_statement=eval_statement,
+            clock_cycle_code=clock_cycle_code   
         )
         
         cpp_testbench_file = os.path.join(self.output_dir, f"{self.module_name}_testbench.cpp")
@@ -335,7 +390,20 @@ class model:
                 if self.process and self.process.poll() is None:
                     line = self.process.stdout.readline().decode().strip()
                     if line:
-                        self.process_output_queue.put(line)
+                        # Check for WAIT_CYCLES_COMPLETE message
+                        if line.startswith("WAIT_CYCLES_COMPLETE:"):
+                            # Extract the number of cycles from the message
+                            try:
+                                cycles = int(line.split(":")[1].strip())
+                                if cycles == self.expected_cycles:
+                                    self.wait_cycles_complete.set()
+                                else:
+                                    print(f"Warning: Expected {self.expected_cycles} cycles, got {cycles}")
+                            except (ValueError, IndexError):
+                                print(f"Warning: Invalid WAIT_CYCLES_COMPLETE format: {line}")
+                        else:
+                            # Regular output, put in queue for normal processing
+                            self.process_output_queue.put(line)
                 else:
                     # Only sleep if we're not actively reading
                     time.sleep(0.01)
@@ -374,6 +442,8 @@ class model:
                                     value = int(data[i])
                                     command_parts.append(str(value))
                                     log_parts.append(f"{port.name}={value}")
+                                    # print(f"Setting {port.name}={value}")
+                                print(f"Log parts: {log_parts}")
                                 
                                 # Create the command string with all inputs
                                 command = " ".join(command_parts) + "\n"
