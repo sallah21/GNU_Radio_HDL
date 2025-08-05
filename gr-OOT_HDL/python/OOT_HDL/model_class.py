@@ -135,14 +135,31 @@ class model:
 
     def generate_display(self):
         """Generate display for template replacement"""
+        if not self.ports:
+            return '"OUTPUT_CHANGE: (no outputs)"'
+        
+        # Get output ports
+        output_ports = [port for port in self.ports if port.type == port_type.OUT]
+        
+        if not output_ports:
+            return '"OUTPUT_CHANGE: (no outputs)"'
+        
+        # Create format string for proper comma-separated output
+        # For 3 outputs: "data_out=" << data_out << ", state_out=" << state_out << ", done=" << done
         display_parts = []
-        for port in self.ports:
-            if port.type == port_type.OUT:
-                display_parts.append(f'"{port.name}="')
-                display_parts.append(f'{port.name}')
-        display = ', '.join(display_parts) if display_parts else '""'
+        for i, port in enumerate(output_ports):
+            if i == 0:
+                # First port: no leading comma
+                display_parts.append(f'"{port.name}=", {port.name}')
+            else:
+                # Subsequent ports: add comma and space before port name
+                display_parts.append(f'", {port.name}=", {port.name}')
+        
+        # Join all parts
+        display = ', '.join(display_parts)
         display = f'"OUTPUT_CHANGE: ", {display}'
-        # print(f"Display: {display}")
+        
+        print(f"DEBUG - Generated display: {display}")
         return display
 
 
@@ -237,7 +254,7 @@ class model:
             output_parts = []
             for port in output_ports:
                 # Fix: Use stream insertion operator (<<) instead of comma
-                output_parts.append(f'<< "{port.name}=" << (int) top->{port.name} ')
+                output_parts.append(f'<< "{port.name}=" << (int) top->{port.name} << ","')
             
             output_print = " ".join(output_parts)
             output_printing.append(f'            std::cout {output_print}<< std::endl;')
@@ -483,8 +500,32 @@ class model:
         # Wait for the output thread to process the data
         self.data_ready.wait()
         result_dict = {}
-        data = self.data.split("=")
-        result_dict[data[0]] = data[1]
+        
+        # Handle multiple output parsing
+        # Expected format: "OUTPUT_CHANGE: data_out=10, state_out=3, done=0"
+        output_line = self.data
+        
+        # Remove "OUTPUT_CHANGE: " prefix if present
+        if "OUTPUT_CHANGE:" in output_line:
+            output_line = output_line.split("OUTPUT_CHANGE:")[1].strip()
+        
+        print(f"Output line: {output_line}")
+        # Split by comma to get individual key=value pairs
+        pairs = output_line.split(",")
+        
+        for pair in pairs:
+            pair = pair.strip()
+            if "=" in pair:
+                key, value = pair.split("=", 1)  # Split only on first "="
+                key = key.strip()
+                value = value.strip()
+                
+                # Try to convert to int if possible, otherwise keep as string
+                try:
+                    result_dict[key] = int(value)
+                except ValueError:
+                    result_dict[key] = value
+        
         return result_dict
 
 

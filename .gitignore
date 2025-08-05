@@ -166,9 +166,6 @@ obj_dir/
 *obj_dir*
 *.cpp
 *.h
-*.v
-*.vh
-*.sv
 *.pyc
 *.pyo
 *.pyd

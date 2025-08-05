@@ -1,0 +1,490 @@
+=== Memory FSM Test ===
+Testing module with internal state machine and memory array
+Debug: Port section found: 
+    input wire clk,
+    input wire rst,
+    input wire [7:0] data_in,
+    input wire start,
+    output reg [7:0] data_out,
+    output reg [2:0] state_out,
+    output reg done
+...
+Debug: Found 7 port matches
+Debug: Processing match: ('input', 'wire', '', 'clk')
+Debug: Added port: clk (input) size 1
+Debug: Processing match: ('input', 'wire', '', 'rst')
+Debug: Added port: rst (input) size 1
+Debug: Processing match: ('input', 'wire', '7', 'data_in')
+Debug: Added port: data_in (input) size 8
+Debug: Processing match: ('input', 'wire', '', 'start')
+Debug: Added port: start (input) size 1
+Debug: Processing match: ('output', 'reg', '7', 'data_out')
+Debug: Added port: data_out (output) size 8
+Debug: Processing match: ('output', 'reg', '2', 'state_out')
+Debug: Added port: state_out (output) size 3
+Debug: Processing match: ('output', 'reg', '', 'done')
+Debug: Added port: done (output) size 1
+Has clock ports: True
+Wrapper output path: /Users/salsamon/Documents/Magisterka/gr-OOT_HDL/python/OOT_HDL/memory_fsm_wrapper.v
+Starting process: /Users/salsamon/Documents/Magisterka/gr-OOT_HDL/python/OOT_HDL/memory_fsm_obj_dir/Vmemory_fsm_wrapper
+
+--- Test 1: Reset and Initial State ---
+Input data: [0, 1, 0, 0]
+Log parts: ['clk=0', 'rst=1', 'data_in=0', 'start=0']
+Setting clk=0, rst=1, data_in=0, start=0
+Output line: data_out=0,state_out=0,done=0,
+Reset state: {'data_out': 0, 'state_out': 0, 'done': 0}
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=0,done=0,
+After reset release: {'data_out': 0, 'state_out': 0, 'done': 0}
+Waiting for 2 clock cycles...
+Clock cycles completed: 2
+
+--- Test 2: Start FSM and Store Data ---
+Input data: [0, 0, 10, 1]
+Log parts: ['clk=0', 'rst=0', 'data_in=10', 'start=1']
+Setting clk=0, rst=0, data_in=10, start=1
+Output line: data_out=0,state_out=0,done=0,
+Start FSM: {'data_out': 0, 'state_out': 0, 'done': 0}
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Storing data in memory...
+Input data: [0, 0, 10, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=10', 'start=0']
+Setting clk=0, rst=0, data_in=10, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 1: data=10, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 20, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=20', 'start=0']
+Setting clk=0, rst=0, data_in=20, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 2: data=20, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 30, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=30', 'start=0']
+Setting clk=0, rst=0, data_in=30, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 3: data=30, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 40, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=40', 'start=0']
+Setting clk=0, rst=0, data_in=40, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 4: data=40, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 50, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=50', 'start=0']
+Setting clk=0, rst=0, data_in=50, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 5: data=50, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 60, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=60', 'start=0']
+Setting clk=0, rst=0, data_in=60, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 6: data=60, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 70, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=70', 'start=0']
+Setting clk=0, rst=0, data_in=70, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 7: data=70, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 80, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=80', 'start=0']
+Setting clk=0, rst=0, data_in=80, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 8: data=80, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 90, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=90', 'start=0']
+Setting clk=0, rst=0, data_in=90, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 9: data=90, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 100, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=100', 'start=0']
+Setting clk=0, rst=0, data_in=100, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 10: data=100, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 110, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=110', 'start=0']
+Setting clk=0, rst=0, data_in=110, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 11: data=110, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 120, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=120', 'start=0']
+Setting clk=0, rst=0, data_in=120, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 12: data=120, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 130, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=130', 'start=0']
+Setting clk=0, rst=0, data_in=130, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 13: data=130, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 140, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=140', 'start=0']
+Setting clk=0, rst=0, data_in=140, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 14: data=140, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 150, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=150', 'start=0']
+Setting clk=0, rst=0, data_in=150, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 15: data=150, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 160, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=160', 'start=0']
+Setting clk=0, rst=0, data_in=160, start=0
+Output line: data_out=0,state_out=1,done=0,
+Store cycle 16: data=160, state=1
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+
+--- Test 3: Processing Phase ---
+FSM processing stored data...
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 1: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 2: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 3: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 4: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 5: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 6: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 7: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 8: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 9: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 10: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 11: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 12: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 13: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 14: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 15: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=2,done=0,
+Process cycle 16: state=2
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+
+--- Test 4: Read Phase ---
+FSM reading processed data...
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=0,state_out=3,done=0,
+Read cycle 1: data_out=0, state=3
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=10,state_out=3,done=0,
+Read cycle 2: data_out=10, state=3
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=20,state_out=3,done=0,
+Read cycle 3: data_out=20, state=3
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=30,state_out=3,done=0,
+Read cycle 4: data_out=30, state=3
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=40,state_out=3,done=0,
+Read cycle 5: data_out=40, state=3
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=50,state_out=3,done=0,
+Read cycle 6: data_out=50, state=3
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=60,state_out=3,done=0,
+Read cycle 7: data_out=60, state=3
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=70,state_out=3,done=0,
+Read cycle 8: data_out=70, state=3
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Read data sequence: [0, 10, 20, 30, 40, 50, 60, 70]
+
+--- Test 5: Output Phase ---
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=80,state_out=4,done=0,
+Final accumulated result: 80
+Done flag: 0
+Final state: 4
+Expected accumulated sum (8-bit): 80
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+
+--- Test 6: Return to IDLE ---
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=80,state_out=0,done=1,
+Return to IDLE: state=0, done=1
+
+--- Test 7: Multiple Cycles Test ---
+Starting second processing cycle...
+Input data: [0, 0, 0, 1]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=1']
+Setting clk=0, rst=0, data_in=0, start=1
+Output line: data_out=80,state_out=0,done=1,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 1, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=1', 'start=0']
+Setting clk=0, rst=0, data_in=1, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 2, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=2', 'start=0']
+Setting clk=0, rst=0, data_in=2, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 3, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=3', 'start=0']
+Setting clk=0, rst=0, data_in=3, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 4, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=4', 'start=0']
+Setting clk=0, rst=0, data_in=4, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 5, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=5', 'start=0']
+Setting clk=0, rst=0, data_in=5, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 6, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=6', 'start=0']
+Setting clk=0, rst=0, data_in=6, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 7, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=7', 'start=0']
+Setting clk=0, rst=0, data_in=7, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 8, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=8', 'start=0']
+Setting clk=0, rst=0, data_in=8, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 9, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=9', 'start=0']
+Setting clk=0, rst=0, data_in=9, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 10, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=10', 'start=0']
+Setting clk=0, rst=0, data_in=10, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 11, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=11', 'start=0']
+Setting clk=0, rst=0, data_in=11, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 12, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=12', 'start=0']
+Setting clk=0, rst=0, data_in=12, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 13, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=13', 'start=0']
+Setting clk=0, rst=0, data_in=13, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 14, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=14', 'start=0']
+Setting clk=0, rst=0, data_in=14, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 15, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=15', 'start=0']
+Setting clk=0, rst=0, data_in=15, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Input data: [0, 0, 16, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=16', 'start=0']
+Setting clk=0, rst=0, data_in=16, start=0
+Output line: data_out=80,state_out=1,done=0,
+Waiting for 1 clock cycles...
+Clock cycles completed: 1
+Waiting for 25 clock cycles...
+Clock cycles completed: 25
+Input data: [0, 0, 0, 0]
+Log parts: ['clk=0', 'rst=0', 'data_in=0', 'start=0']
+Setting clk=0, rst=0, data_in=0, start=0
+Output line: data_out=136,state_out=0,done=1,
+Second cycle result: 136
+Expected result: 136
+
+=== Test Summary ===
+✅ Internal state machine transitions working
+✅ Internal memory array operations working
+✅ State persistence between clock cycles working
+✅ Complex sequential logic working
+✅ Multiple processing cycles working
+Stopping process...
+Waiting for threads to finish...
+Terminating process...
+Processing thread stopped
+Model process stopped
+
+Test completed successfully!
+
+=== Simple Memory Module Test ===
