@@ -45,11 +45,34 @@ class Verilog_parser:
         
 
     def parse_ports(self):
-        pattern = r"\b(input|output|inout)\b\s*(?:(signed|unsigned)\s+)?(?:wire|reg|logic|bit|integer|real|time|int|shortint|longint)?\s*(?:\[\s*(\d+)\s*:\s*\d+\s*\])?\s*([a-zA-Z_][a-zA-Z0-9_$]*)"
-        matches = re.findall(pattern, self.file_conent)
+        # More precise pattern that only matches port declarations in module header
+        # This pattern looks for ports specifically in the module declaration section
+        
+        # First, extract just the module declaration section (between module name and first semicolon or begin)
+        module_pattern = r"module\s+[a-zA-Z_][a-zA-Z0-9_$]*\s*(?:#\([^)]*\))?\s*\((.*?)\);"
+        module_match = re.search(module_pattern, self.file_conent, re.DOTALL)
+        
+        if not module_match:
+            # Fallback: look for module declaration without semicolon
+            module_pattern = r"module\s+[a-zA-Z_][a-zA-Z0-9_$]*\s*(?:#\([^)]*\))?\s*\((.*?)\)\s*;"
+            module_match = re.search(module_pattern, self.file_conent, re.DOTALL)
+        
+        if module_match:
+            port_section = module_match.group(1)
+            print(f"Debug: Port section found: {port_section[:200]}...")  # Debug output
+        else:
+            print("Debug: No module port section found, using entire file")
+            port_section = self.file_conent
+        
+        # More precise pattern for port declarations
+        pattern = r"\b(input|output|inout)\s+(?:(wire|reg|logic)\s+)?(?:\[\s*(\d+)\s*:\s*\d+\s*\])?\s*([a-zA-Z_][a-zA-Z0-9_$]*)"
+        matches = re.findall(pattern, port_section)
+        
+        print(f"Debug: Found {len(matches)} port matches")  # Debug output
+        
         for match in matches:
-            # print(match)
-            port_direction, sign, size_str, name = match
+            print(f"Debug: Processing match: {match}")  # Debug output
+            port_direction, wire_type, size_str, name = match
             port = None
             type = port_type(port_direction)
             
@@ -57,6 +80,7 @@ class Verilog_parser:
             size = int(size_str) + 1 if size_str else 1
             port = Port(name, size, type)
             self.ports.append(port)
+            print(f"Debug: Added port: {name} ({type.value}) size {size}")  # Debug output
 
 
     def parse_module_name(self):
