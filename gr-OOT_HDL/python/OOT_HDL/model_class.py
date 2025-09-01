@@ -29,6 +29,17 @@ class model:
         self.exe_file = None
         self.model_file_wrapper = None
         self.has_clock = None
+        # Handle-protocol + stats
+        self.stats = {'bytes_in': 0, 'lines_in': 0, 'bytes_out': 0, 'lines_out': 0}
+        self.use_handles = False
+        self.prefer_handles = True  # feature flag to attempt handle protocol
+        self.name_to_id = {}
+        self.id_to_meta = {}
+        self.handshake_done = threading.Event()
+        # internal handshake state
+        self._hello_ok = False
+        self._bind_expected = None
+        self._bind_received = 0
 
         # Verilog wrapper for returning output values
         self.wrapper_template = """
@@ -51,6 +62,8 @@ class model:
         );
         """
         self.wrapper_output = None
+        # Back-compat alias for external consumers
+        self.output_queue = self.process_output_queue
         pass
 
     def detect_clock_signals(self):
@@ -405,8 +418,12 @@ class model:
         while self.running:
             try:
                 if self.process and self.process.poll() is None:
-                    line = self.process.stdout.readline().decode().strip()
+                    raw = self.process.stdout.readline()
+                    line = raw.decode().strip() if raw else ""
                     if line:
+                        # stats
+                        self.stats['bytes_in'] += len(line) + 1
+                        self.stats['lines_in'] += 1
                         # Check for WAIT_CYCLES_COMPLETE message
                         if line.startswith("WAIT_CYCLES_COMPLETE:"):
                             # Extract the number of cycles from the message
@@ -418,6 +435,54 @@ class model:
                                     print(f"Warning: Expected {self.expected_cycles} cycles, got {cycles}")
                             except (ValueError, IndexError):
                                 print(f"Warning: Invalid WAIT_CYCLES_COMPLETE format: {line}")
+                        # Handle-based protocol handshake parsing
+                        elif line.startswith("HELLO_OK"):
+                            self._hello_ok = True
+                            # Don't forward handshake lines to consumers
+                            continue
+                        elif line.startswith("BIND_OK"):
+                            try:
+                                parts = line.split()
+                                if len(parts) >= 2:
+                                    self._bind_expected = int(parts[1])
+                                    self._bind_received = 0
+                            except Exception as e:
+                                print(f"Warning: Invalid BIND_OK format '{line}': {e}")
+                            continue
+                        elif line.startswith("H "):
+                            # Format: H <id> <dir> <width> <name>
+                            try:
+                                parts = line.split(maxsplit=4)
+                                if len(parts) >= 5:
+                                    _, sid, sdir, swidth, sname = parts
+                                    hid = int(sid)
+                                    self.id_to_meta[hid] = {"dir": sdir, "width": int(swidth), "name": sname}
+                                    if sdir.upper() == "IN":
+                                        self.name_to_id[sname] = hid
+                                    self._bind_received = (self._bind_received or 0) + 1
+                                    if self._bind_expected is not None and self._bind_received >= self._bind_expected:
+                                        self.use_handles = True
+                                        self.handshake_done.set()
+                                else:
+                                    print(f"Warning: Malformed H line: {line}")
+                            except Exception as e:
+                                print(f"Error parsing H line '{line}': {e}")
+                            continue
+                        elif line.startswith("CHG") and self.use_handles:
+                            # Convert CHG id=value ... to legacy OUTPUT_CHANGE: name=value, ...
+                            try:
+                                parts = line.split()[1:]
+                                kv_pairs = []
+                                for p in parts:
+                                    if '=' in p:
+                                        sid, sval = p.split('=', 1)
+                                        meta = self.id_to_meta.get(int(sid), None)
+                                        name = meta['name'] if meta else sid
+                                        kv_pairs.append(f"{name}={sval}")
+                                legacy = "OUTPUT_CHANGE: " + ", ".join(kv_pairs)
+                                self.process_output_queue.put(legacy)
+                            except Exception as e:
+                                print(f"Error parsing CHG line: {e} ({line})")
                         else:
                             # Regular output, put in queue for normal processing
                             self.process_output_queue.put(line)
@@ -569,19 +634,25 @@ class model:
          stdin=subprocess.PIPE, 
          stdout=subprocess.PIPE, 
          stderr=subprocess.PIPE)
-        # print(f"Process started: {self.process}")
-        self.input_thread = threading.Thread(target=self._input_thread)
-        self.input_thread.daemon = True
-        self.input_thread.start()
-        # Start processing thread to read output from the process
+        # Start processing thread first (needed for handshake parsing)
         self.processing_thread = threading.Thread(target=self._processing_thread)
         self.processing_thread.daemon = True
         self.processing_thread.start()
-        # print(f"Input thread started: {self.input_thread}")
+        # Optional handle-based handshake (non-blocking fallback on timeout)
+        if self.prefer_handles:
+            ok = self._send_handshake_and_bind(timeout=1.0)
+            if ok:
+                print("Handle-based protocol enabled")
+            else:
+                print("Handle handshake failed or timed out; using legacy protocol")
+                self.use_handles = False
+        # Then start input/output threads
+        self.input_thread = threading.Thread(target=self._input_thread)
+        self.input_thread.daemon = True
+        self.input_thread.start()
         self.output_thread = threading.Thread(target=self._output_thread)
         self.output_thread.daemon = True
         self.output_thread.start()
-        # print(f"Output thread started: {self.output_thread}")
         pass
 
     def generate_model(self):
@@ -591,6 +662,38 @@ class model:
         self.compile_model()
         self.start_process()
         pass
+
+    def _send_handshake_and_bind(self, timeout: float = 1.0) -> bool:
+        """Send HELLO/BIND and wait briefly for processing thread to complete handshake.
+        Returns True if handles are enabled, else False (legacy fallback).
+        """
+        try:
+            # Reset handshake state
+            self.handshake_done.clear()
+            self._hello_ok = False
+            self._bind_expected = None
+            self._bind_received = 0
+            # Send HELLO + BIND
+            hello = "HELLO 1\n".encode()
+            self.process.stdin.write(hello)
+            self.process.stdin.flush()
+            self.stats['bytes_out'] += len(hello)
+            self.stats['lines_out'] += 1
+            bind = "BIND\n".encode()
+            self.process.stdin.write(bind)
+            self.process.stdin.flush()
+            self.stats['bytes_out'] += len(bind)
+            self.stats['lines_out'] += 1
+            # Wait for handshake to complete
+            if self.handshake_done.wait(timeout=timeout):
+                return True
+            return False
+        except Exception as e:
+            print(f"Handshake error: {e}")
+            return False
+
+    def get_stats(self):
+        return dict(self.stats)
 
 if __name__ == "__main__":
     model = model("/Users/salsamon/Documents/Magisterka/multiplier.v", "/Users/salsamon/Documents/Magisterka/gr-OOT_HDL/python/OOT_HDL")
