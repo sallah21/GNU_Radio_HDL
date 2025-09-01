@@ -272,14 +272,51 @@ class model:
             output_print = " ".join(output_parts)
             output_printing.append(f'            std::cout {output_print}<< std::endl;')
         
+        # Handle-based protocol mappings (IDs)
+        num_inputs = len(input_ports)
+        num_outputs = len(output_ports)
+        bind_lines = []
+        setters = []
+        getters = []
+        for i, port in enumerate(input_ports):
+            bind_lines.append(f'                    std::cout << "H {i} IN {port.size} {port.name}" << std::endl;')
+            setters.append(f'            case {i}: top->{port.name} = value; return true;')
+        for i, port in enumerate(output_ports):
+            hid = num_inputs + i
+            bind_lines.append(f'                    std::cout << "H {hid} OUT {port.size} {port.name}" << std::endl;')
+            getters.append(f'            case {hid}: return (int) top->{port.name};')
+        
         # Dynamically generate a custom C++ testbench for the model based on its ports
         cpp_testbench_template = """
         // Automatically generated testbench for {module_name}
         #include <iostream>
         #include <string>
         #include <sstream>
+        #include <vector>
         #include "V{module_name}_wrapper.h"
         #include "verilated.h"
+
+        static inline bool starts_with(const std::string& s, const std::string& p) {{
+            return s.rfind(p, 0) == 0;
+        }}
+
+        static inline void step_eval(V{module_name}_wrapper* top) {{
+        {clock_cycle_code}
+        }}
+
+        static inline bool set_by_id(V{module_name}_wrapper* top, int id, int value) {{
+            switch (id) {{
+        {setters}
+            default: return false;
+            }}
+        }}
+
+        static inline int get_by_id(V{module_name}_wrapper* top, int id) {{
+            switch (id) {{
+        {getters}
+            default: return 0;
+            }}
+        }}
 
         // Main testbench code
         int main(int argc, char** argv) {{
@@ -289,9 +326,72 @@ class model:
             // Create an instance of the Verilator-generated module
             V{module_name}_wrapper* top = new V{module_name}_wrapper;
             
+            const int NUM_INPUTS = {num_inputs};
+            const int NUM_OUTPUTS = {num_outputs};
+            std::vector<int> prev_out(NUM_OUTPUTS, -2147483648);
+            
             // Process input/output in a loop
             std::string line;
             while (std::getline(std::cin, line)) {{
+                // Handle-based commands
+                if (starts_with(line, "HELLO")) {{
+                    std::cout << "HELLO_OK 1" << std::endl;
+                    std::cout.flush();
+                    continue;
+                }} else if (starts_with(line, "BIND")) {{
+                    std::cout << "BIND_OK " << (NUM_INPUTS + NUM_OUTPUTS) << std::endl;
+        {bind_lines}
+                    std::cout.flush();
+                    continue;
+                }} else if (starts_with(line, "SETB")) {{
+                    std::istringstream iss(line.substr(5));
+                    std::string tok;
+                    while (iss >> tok) {{
+                        size_t eq = tok.find('=');
+                        if (eq != std::string::npos) {{
+                            int id = std::stoi(tok.substr(0, eq));
+                            int val = std::stoi(tok.substr(eq + 1));
+                            set_by_id(top, id, val);
+                        }}
+                    }}
+                    continue;
+                }} else if (starts_with(line, "READB")) {{
+                    std::istringstream iss(line.substr(6));
+                    std::string tok;
+                    std::cout << "R";
+                    while (iss >> tok) {{
+                        int id = std::stoi(tok);
+                        int val = get_by_id(top, id);
+                        std::cout << " " << id << "=" << val;
+                    }}
+                    std::cout << std::endl;
+                    std::cout.flush();
+                    continue;
+                }} else if (starts_with(line, "STEP")) {{
+                    int steps = 1;
+                    if (line.size() > 4) {{
+                        std::istringstream iss(line.substr(4));
+                        iss >> steps;
+                        if (steps <= 0) steps = 1;
+                    }}
+                    for (int s = 0; s < steps; ++s) {{
+                        step_eval(top);
+                        std::ostringstream chg;
+                        chg << "CHG";
+                        for (int i = 0; i < NUM_OUTPUTS; ++i) {{
+                            int id = NUM_INPUTS + i;
+                            int val = get_by_id(top, id);
+                            if (val != prev_out[i]) {{
+                                prev_out[i] = val;
+                                chg << " " << id << "=" << val;
+                            }}
+                        }}
+                        std::cout << chg.str() << std::endl;
+                    }}
+                    std::cout.flush();
+                    continue;
+                }}
+                
                 // Check for special WAIT_CYCLES command
                 if (line.find("WAIT_CYCLES") == 0) {{
                     std::istringstream iss(line);
@@ -308,7 +408,7 @@ class model:
                     continue;
                 }}
                 
-                // Parse regular input values
+                // Parse regular input values (legacy positional fallback)
         {input_declarations_code}
         {input_parsing_code}
         {input_setting_code}
@@ -327,7 +427,7 @@ class model:
             return 0;
         }}
         """
-
+{{ ... }}
         eval_statement = None 
 
         if self.has_clock:
@@ -357,7 +457,12 @@ class model:
             input_setting_code="\n".join(input_setting),
             output_printing_code="\n".join(output_printing),
             eval_statement=eval_statement,
-            clock_cycle_code=clock_cycle_code   
+            clock_cycle_code=clock_cycle_code,
+            num_inputs=num_inputs,
+            num_outputs=num_outputs,
+            bind_lines="\n".join(bind_lines),
+            setters="\n".join(setters),
+            getters="\n".join(getters)
         )
         
         cpp_testbench_file = os.path.join(self.output_dir, f"{self.module_name}_testbench.cpp")
@@ -511,29 +616,50 @@ class model:
                             
                             # Validate data length matches number of input ports
                             if len(data) == len(input_ports):
-                                # Build command dynamically based on available inputs
-                                command_parts = []
-                                
-                                # Log for debugging
-                                log_parts = []
-                                
-                                # Process each input port with corresponding data
-                                for i, port in enumerate(input_ports):
-                                    # Convert input according to port specifications
-                                    # This might need adjustment based on actual port types
-                                    value = int(data[i])
-                                    command_parts.append(str(value))
-                                    log_parts.append(f"{port.name}={value}")
-                                    # print(f"Setting {port.name}={value}")
-                                print(f"Log parts: {log_parts}")
-                                
-                                # Create the command string with all inputs
-                                command = " ".join(command_parts) + "\n"
-                                print(f"Setting {', '.join(log_parts)}")
-                                
-                                # Send the command to the process
-                                self.process.stdin.write(command.encode())
-                                self.process.stdin.flush()
+                                if self.use_handles:
+                                    # Build SETB with handle IDs, then STEP 1
+                                    parts = []
+                                    log_parts = []
+                                    ok = True
+                                    for i, port in enumerate(input_ports):
+                                        try:
+                                            hid = self.name_to_id[port.name]
+                                        except KeyError:
+                                            ok = False
+                                            break
+                                        value = int(data[i])
+                                        parts.append(f"{hid}={value}")
+                                        log_parts.append(f"{port.name}={value}")
+                                    if ok:
+                                        cmd1 = "SETB " + " ".join(parts) + "\n"
+                                        self.process.stdin.write(cmd1.encode())
+                                        self.process.stdin.flush()
+                                        self.stats['bytes_out'] += len(cmd1)
+                                        self.stats['lines_out'] += 1
+                                        cmd2 = "STEP 1\n"
+                                        self.process.stdin.write(cmd2.encode())
+                                        self.process.stdin.flush()
+                                        self.stats['bytes_out'] += len(cmd2)
+                                        self.stats['lines_out'] += 1
+                                        print(f"[handles] Setting {', '.join(log_parts)} and stepping 1")
+                                    else:
+                                        # Fallback to legacy if IDs missing
+                                        command = " ".join(str(int(x)) for x in data) + "\n"
+                                        self.process.stdin.write(command.encode())
+                                        self.process.stdin.flush()
+                                else:
+                                    # Legacy positional path
+                                    command_parts = []
+                                    log_parts = []
+                                    for i, port in enumerate(input_ports):
+                                        value = int(data[i])
+                                        command_parts.append(str(value))
+                                        log_parts.append(f"{port.name}={value}")
+                                    print(f"Log parts: {log_parts}")
+                                    command = " ".join(command_parts) + "\n"
+                                    print(f"Setting {', '.join(log_parts)}")
+                                    self.process.stdin.write(command.encode())
+                                    self.process.stdin.flush()
                             else:
                                 print(f"Warning: Invalid data length. Expected {len(input_ports)} inputs for ports {[port.name for port in input_ports]}, got {len(data)} values: {data}")
                         else:
