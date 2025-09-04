@@ -1,47 +1,51 @@
-# Model class
-import subprocess
-from .verilog_parser import Port, port_type, Verilog_parser
-import os
-import threading
-import queue
-import time
+"""Moduł model_class.py
+Integracja symulacji HDL (Verilog + Verilator) z Pythonem/GNU Radio.
 
-
+Architektura:
+- 3 wątki: wejściowy (input), przetwarzający (processing), wyjściowy (output)
+- Kolejki do komunikacji i zdarzenia Threading.Event do synchronizacji
+- Opcjonalny protokół uchwytów (handle-based) dla szybkiego ustawiania/odczytu sygnałów
+- Ręczne sterowanie zegarem z poziomu Pythona (wait_n_cycles) i śledzenie kroków (step trace)
+"""
 class model:
     def __init__(self, model_file, output_dir):
-        self.input_queue = queue.Queue()
-        self.process_output_queue = queue.Queue()
-        self.data_ready = threading.Event()
-        self.wait_cycles_complete = threading.Event()  # Event for wait_n_cycles synchronization
-        self.expected_cycles = 0  # Track expected number of cycles
-        self.data = None
-        self.running = False
-        self.input_thread = None
-        self.output_thread = None
-        self.model_file = model_file
-        self.output_dir = output_dir
-        self.module_name = None
-        self.params = None
-        self.ports = None
-        self.inputs = None
-        self.outputs = None
-        self.process = None
-        self.exe_file = None
-        self.model_file_wrapper = None
-        self.has_clock = None
-        # Handle-protocol + stats
-        self.stats = {'bytes_in': 0, 'lines_in': 0, 'bytes_out': 0, 'lines_out': 0}
-        self.use_handles = False
-        self.prefer_handles = True  # feature flag to attempt handle protocol
-        self.name_to_id = {}
-        self.id_to_meta = {}
-        self.handshake_done = threading.Event()
-        # internal handshake state
-        self._hello_ok = False
-        self._bind_expected = None
-        self._bind_received = 0
-
-        # Verilog wrapper for returning output values
+        self.input_queue = queue.Queue()  # Kolejka danych wejściowych (FIFO) do wątku wejściowego
+        self.process_output_queue = queue.Queue()  # Kolejka surowego wyjścia z procesu (przetwarzana dalej)
+        self.data_ready = threading.Event()  # Zdarzenie sygnalizujące gotowość danych dla run_model()
+        self.wait_cycles_complete = threading.Event()  # Zdarzenie do synchronizacji wait_n_cycles
+        self.expected_cycles = 0  # Liczba oczekiwanych cykli
+        self.data = None  # Ostatnie odebrane dane wyjściowe
+        self.running = False  # Flaga życia wątków
+        self.input_thread = None  # Uchwyt do wątku wejściowego
+        self.output_thread = None  # Uchwyt do wątku wyjściowego
+        self.model_file = model_file  # Ścieżka do pliku Verilog
+        self.output_dir = output_dir  # Katalog wyjściowy (dla artefaktów kompilacji)
+        self.module_name = None  # Nazwa modułu Verilog
+        self.params = None  # Parametry modułu
+        self.ports = None  # Lista portów modułu
+        self.inputs = None  # Tekst wejść do wrappera
+        self.outputs = None  # Tekst wyjść do wrappera
+        self.process = None  # Obiekt Popen procesu modelu
+        self.exe_file = None  # Ścieżka do pliku wykonywalnego (testbench)
+        self.model_file_wrapper = None  # Ścieżka do wygenerowanego wrappera Verilog
+        self.has_clock = None  # Czy wykryto port zegara
+        # Protokół uchwytów (handle-based) + statystyki IO
+        self.stats = {'bytes_in': 0, 'lines_in': 0, 'bytes_out': 0, 'lines_out': 0}  # Liczniki bajtów/linii IO
+        self.use_handles = False  # Czy używać protokołu uchwytów (po handshake)
+        self.prefer_handles = True  # Flaga próby włączenia protokołu uchwytów
+        self.name_to_id = {}  # Mapowanie nazwa->ID (dla SETB/READB)
+        self.id_to_meta = {}  # Metadane portów wg ID
+        self.handshake_done = threading.Event()  # Zdarzenie zakończenia handshake
+        # Wewnętrzny stan handshake
+        self._hello_ok = False  # Czy otrzymano HELLO_OK
+        self._bind_expected = None  # Oczekiwana liczba linii H/BIND
+        self._bind_received = 0  # Liczba odebranych linii H
+        # Śledzenie kroków (timing)
+        self._trace_enabled = False  # Włączenie śledzenia kroków
+        self._last_trace = {}  # Ostatni snapshot czasów
+        self._trace_current = None  # Bieżący bufor śledzenia
+        self._trace_lock = threading.Lock()  # Blokada dla danych śledzenia
+        # Szablon wrappera Verilog do zwracania wartości wyjściowych
         self.wrapper_template = """
         module {module_name}_wrapper
         {parameters}
@@ -67,7 +71,7 @@ class model:
         pass
 
     def detect_clock_signals(self):
-        """Detect if module uses clock signals"""
+        """Wykrywa, czy moduł zawiera porty zegara (np. 'clk', 'clock')."""
         clock_patterns = ['clk', 'clock', 'CLK', 'CLOCK']
         self.has_clock = False
         self.clock_ports = []
@@ -80,7 +84,7 @@ class model:
         return self.has_clock
 
     def wait_n_cycles(self, n):
-        """Wait for n clock cycles"""
+        """Czeka na n cykli zegara (sterowanie ręczne z poziomu Pythona)."""
         if not self.has_clock:
             raise Exception("Model does not have clock ports")
         
@@ -90,7 +94,7 @@ class model:
         # Send special command to wait for n clock cycles
         # Format: "WAIT_CYCLES <n>\n"
         command = f"WAIT_CYCLES {n}\n"
-        print(f"Waiting for {n} clock cycles...")
+        print(f"Czekam na {n} cykle zegara...")
         
         try:
             # Set up synchronization before sending command
@@ -104,50 +108,50 @@ class model:
             # Wait for the event to be set by the processing thread
             # This is much more efficient than busy waiting
             if self.wait_cycles_complete.wait(timeout=10.0):
-                print(f"Clock cycles completed: {n}")
+                print(f"Zakończono {n} cykle zegara")
                 return
             else:
-                raise Exception(f"Timeout waiting for {n} clock cycles to complete")
+                raise Exception(f"Przekroczono limit czasu oczekiwania na {n} cykle zegara")
             
         except Exception as e:
-            print(f"Error sending wait_n_cycles command: {e}")
+            print(f"Błąd wysyłania polecenia wait_n_cycles: {e}")
             raise
 
 
     def get_model_file(self):
-        """Get model file"""
+        """Zwraca ścieżkę pliku modelu Verilog."""
         return self.model_file
 
     def get_output_dir(self):
-        """Get output directory"""
+        """Zwraca katalog wyjściowy (dla artefaktów kompilacji)."""
         return self.output_dir
 
     def generate_ports(self):
-        """Generate ports for template replacement"""
+        """Generuje opisy portów i połączeń do podstawienia w szablonach."""
         port_type_map = {
             port_type.IN: "input",
             port_type.OUT: "output",
             port_type.INOUT: "inout"
         }
         self.has_clock = self.detect_clock_signals()
-        print(f"Has clock ports: {self.has_clock}")
+        print(f"Znaleziono porty zegara: {self.has_clock}")
         # Generate inputs and outputs for template replacement
         inputs = ",\n ".join([f" {port_type_map[port.type]} [{port.size-1}:0] {port.name}" for port in self.ports if port.type != port_type.OUT])
         outputs = ",\n ".join([f" {port_type_map[port.type]} [{port.size-1}:0] {port.name}" for port in self.ports if port.type == port_type.OUT])
-        # print(f"Inputs: {inputs}")
-        # print(f"Outputs: {outputs}")  
+        # print(f"Wejścia: {inputs}")
+        # print(f"Wyjścia: {outputs}")  
         
         # Generate instance inputs and outputs for template replacement
         instance_inputs = ",\n ".join([f" .{port.name}({port.name})" for port in self.ports if port.type != port_type.OUT])
         instance_outputs = ",\n ".join([f" .{port.name}({port.name})" for port in self.ports if port.type == port_type.OUT])
-        # print(f"Instance inputs: {instance_inputs}")
-        # print(f"Instance outputs: {instance_outputs}")
+        # print(f"Wejścia instancji: {instance_inputs}")
+        # print(f"Wyjścia instancji: {instance_outputs}")
         return inputs, outputs, instance_inputs, instance_outputs
         pass
 
 
     def generate_display(self):
-        """Generate display for template replacement"""
+        """Generuje fragment C++ wypisujący wartości portów wyjściowych."""
         if not self.ports:
             return '"OUTPUT_CHANGE: (no outputs)"'
         
@@ -172,12 +176,12 @@ class model:
         display = ', '.join(display_parts)
         display = f'"OUTPUT_CHANGE: ", {display}'
         
-        print(f"DEBUG - Generated display: {display}")
+        print(f"DEBUG - Wygenerowany display: {display}")
         return display
 
 
     def generate_parameters(self):
-        """Generate parameters for template replacement"""
+        """Generuje sekcję parametrów modułu dla wrappera."""
         if self.params is None:
             return ""
         param_template = "#(\n{params}\n)\n"
@@ -190,7 +194,7 @@ class model:
 
 
     def generate_instance_parameters(self):
-        """Generate instance parameters for template replacement"""
+        """Generuje mapowanie parametrów przy instancjonowaniu modułu."""
         if self.params is None:
             return ""
         param_template = "#({params})"
@@ -203,7 +207,7 @@ class model:
 
 
     def generate_always_at(self):
-        """Generate always at for template replacement"""
+        """Zwraca listę nazw portów wyjściowych (np. do użycia w always @*)."""
         if self.ports is None:
             return ""
         ports = []
@@ -214,7 +218,7 @@ class model:
         return ports
 
     def generate_wrapper(self):
-        """Generate wrapper for template replacement"""
+        """Buduje wrapper Verilog oraz instancję modułu (teksty do szablonów)."""
         inputs, outputs, instance_inputs, instance_outputs = self.generate_ports()
         self.inputs = inputs
         self.outputs = outputs
@@ -234,9 +238,8 @@ class model:
         pass
 
     def compile_model(self):
-        """Compile model with verilator"""
+        """Kompiluje model przy użyciu Verilatora i generuje testbench C++."""
         parameters_values = []
-        # TODO: add parameters values passing 
         for param in self.params:
             parameters_values.append(f"-G{param}=0")
         
@@ -427,7 +430,6 @@ class model:
             return 0;
         }}
         """
-{{ ... }}
         eval_statement = None 
 
         if self.has_clock:
@@ -486,7 +488,7 @@ class model:
             # print(f"cmd_compile: {cmd_compile} \n")
             subprocess.run(cmd_compile, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         except subprocess.CalledProcessError as e:
-            print(f"Error compiling Verilator model: {e}")
+            print(f"Błąd kompilacji modelu Verilator: {e}")
             return
         
         cmd_make = [
@@ -500,8 +502,8 @@ class model:
         self.exe_file = os.path.join(self.output_dir, f"{self.module_name}_obj_dir", f"V{self.module_name}_wrapper")
         pass
 
-
     def parse_model(self):
+        """Parsuje plik Verilog i ustawia nazwę modułu, parametry oraz porty."""
         v_parser = Verilog_parser(self.model_file)
         v_parser.parse_module()
         self.module_name = v_parser.get_module_name()
@@ -509,24 +511,23 @@ class model:
         self.ports = v_parser.get_ports()
         pass
 
-
     def dump_wrapper(self):
-        print(f"Wrapper output path: {os.path.join(self.output_dir, f"{self.module_name}_wrapper.v")}")
+        """Zapisuje wrapper Verilog do pliku i zapamiętuje jego ścieżkę."""
+        print(f"Ścieżka wyjściowa wrappera: {os.path.join(self.output_dir, f'{self.module_name}_wrapper.v')}")
         with open(os.path.join(self.output_dir, f"{self.module_name}_wrapper.v"), "w") as f:
             f.write(self.wrapper_output)
         self.model_file_wrapper = os.path.join(self.output_dir, f"{self.module_name}_wrapper.v")
         pass
 
-
     def _processing_thread(self):
-        # print("Processing thread started")
+        # print("Uruchomiono wątek przetwarzający")
         while self.running:
             try:
                 if self.process and self.process.poll() is None:
                     raw = self.process.stdout.readline()
                     line = raw.decode().strip() if raw else ""
                     if line:
-                        # stats
+                        # statystyki IO
                         self.stats['bytes_in'] += len(line) + 1
                         self.stats['lines_in'] += 1
                         # Check for WAIT_CYCLES_COMPLETE message
@@ -537,9 +538,9 @@ class model:
                                 if cycles == self.expected_cycles:
                                     self.wait_cycles_complete.set()
                                 else:
-                                    print(f"Warning: Expected {self.expected_cycles} cycles, got {cycles}")
+                                    print(f"Ostrzeżenie: Oczekiwano {self.expected_cycles} cykli, otrzymano {cycles}")
                             except (ValueError, IndexError):
-                                print(f"Warning: Invalid WAIT_CYCLES_COMPLETE format: {line}")
+                                print(f"Ostrzeżenie: Niepoprawny format WAIT_CYCLES_COMPLETE: {line}")
                         # Handle-based protocol handshake parsing
                         elif line.startswith("HELLO_OK"):
                             self._hello_ok = True
@@ -552,7 +553,7 @@ class model:
                                     self._bind_expected = int(parts[1])
                                     self._bind_received = 0
                             except Exception as e:
-                                print(f"Warning: Invalid BIND_OK format '{line}': {e}")
+                                print(f"Ostrzeżenie: Niepoprawny format BIND_OK '{line}': {e}")
                             continue
                         elif line.startswith("H "):
                             # Format: H <id> <dir> <width> <name>
@@ -569,13 +570,14 @@ class model:
                                         self.use_handles = True
                                         self.handshake_done.set()
                                 else:
-                                    print(f"Warning: Malformed H line: {line}")
+                                    print(f"Ostrzeżenie: Niepoprawna linia H: {line}")
                             except Exception as e:
-                                print(f"Error parsing H line '{line}': {e}")
+                                print(f"Błąd parsowania linii H '{line}': {e}")
                             continue
                         elif line.startswith("CHG") and self.use_handles:
                             # Convert CHG id=value ... to legacy OUTPUT_CHANGE: name=value, ...
                             try:
+                                self._mark_trace('t_output_received')
                                 parts = line.split()[1:]
                                 kv_pairs = []
                                 for p in parts:
@@ -586,27 +588,29 @@ class model:
                                         kv_pairs.append(f"{name}={sval}")
                                 legacy = "OUTPUT_CHANGE: " + ", ".join(kv_pairs)
                                 self.process_output_queue.put(legacy)
+                                self._mark_trace('t_output_queued')
                             except Exception as e:
-                                print(f"Error parsing CHG line: {e} ({line})")
+                                print(f"Błąd parsowania linii CHG: {e} ({line})")
                         else:
                             # Regular output, put in queue for normal processing
+                            self._mark_trace('t_output_received')
                             self.process_output_queue.put(line)
+                            self._mark_trace('t_output_queued')
                 else:
                     # Only sleep if we're not actively reading
                     time.sleep(0.01)
             except Exception as e:
-                print(f"Processing thread error: {e}")
+                print(f"Błąd wątku przetwarzającego: {e}")
                 # Don't stop running on a single exception
                 time.sleep(0.1)  # Brief pause before trying again
-        print("Processing thread stopped")
-
-
+        print("Wątek przetwarzający zakończony")
     def _input_thread(self):
         while self.running:
             try:
                 if not self.input_queue.empty():
                     data = self.input_queue.get()
-                    print(f"Input data: {data}")
+                    print(f"Dane wejściowe: {data}")
+                    self._mark_trace('t_input_dequeued')
                     if self.process and self.process.poll() is None:
                         # Format the data for the Verilator model
                         # For Verilator with C++ testbench, we need to set top-level signals
@@ -616,6 +620,7 @@ class model:
                             
                             # Validate data length matches number of input ports
                             if len(data) == len(input_ports):
+                                self._mark_trace('t_input_write_start')
                                 if self.use_handles:
                                     # Build SETB with handle IDs, then STEP 1
                                     parts = []
@@ -636,17 +641,22 @@ class model:
                                         self.process.stdin.flush()
                                         self.stats['bytes_out'] += len(cmd1)
                                         self.stats['lines_out'] += 1
+                                        self._mark_trace('t_setb_sent')
                                         cmd2 = "STEP 1\n"
                                         self.process.stdin.write(cmd2.encode())
                                         self.process.stdin.flush()
                                         self.stats['bytes_out'] += len(cmd2)
                                         self.stats['lines_out'] += 1
-                                        print(f"[handles] Setting {', '.join(log_parts)} and stepping 1")
+                                        self._mark_trace('t_step_sent')
+                                        print(f"[handles] Ustawienie {', '.join(log_parts)} i krok 1")
                                     else:
                                         # Fallback to legacy if IDs missing
                                         command = " ".join(str(int(x)) for x in data) + "\n"
                                         self.process.stdin.write(command.encode())
                                         self.process.stdin.flush()
+                                        self.stats['bytes_out'] += len(command)
+                                        self.stats['lines_out'] += 1
+                                        self._mark_trace('t_legacy_sent')
                                 else:
                                     # Legacy positional path
                                     command_parts = []
@@ -657,39 +667,53 @@ class model:
                                         log_parts.append(f"{port.name}={value}")
                                     print(f"Log parts: {log_parts}")
                                     command = " ".join(command_parts) + "\n"
-                                    print(f"Setting {', '.join(log_parts)}")
+                                    print(f"Ustawienie {', '.join(log_parts)}")
                                     self.process.stdin.write(command.encode())
                                     self.process.stdin.flush()
+                                    self.stats['bytes_out'] += len(command)
+                                    self.stats['lines_out'] += 1
+                                    self._mark_trace('t_legacy_sent')
                             else:
-                                print(f"Warning: Invalid data length. Expected {len(input_ports)} inputs for ports {[port.name for port in input_ports]}, got {len(data)} values: {data}")
+                                print(f"Ostrzeżenie: Niepoprawna długość danych. Oczekiwano {len(input_ports)} wejść dla portów {[port.name for port in input_ports]}, otrzymano {len(data)} wartości: {data}")
                         else:
-                            print(f"Warning: Invalid data format. Expected a list of values, got {data}")
+                            print(f"Ostrzeżenie: Niepoprawny format danych. Oczekiwano listy wartości, otrzymano {data}")
                 time.sleep(0.01)
             except Exception as e:
-                print(f"Input thread error: {e}")
+                print(f"Błąd wątku wejściowego: {e}")
                 exit(1)
                 
         pass
-
-
     def _output_thread(self):
         while self.running:
             try:
                 if not self.process_output_queue.empty():
                     self.data = self.process_output_queue.get()
+                    self._mark_trace('t_output_dequeued')
+                    self._mark_trace('t_data_ready_set')
                     self.data_ready.set()
-                    # print(f"Output data: {self.data}")
+                    # print(f"Dane wyjściowe: {self.data}")
             except Exception as e:
-                print(f"Output thread error: {e}")
+                print(f"Błąd wątku wyjściowego: {e}")
             time.sleep(0.01)
         pass
 
-
     def run_model(self,data):
         self.data_ready.clear()
+        # Start trace for this run
+        if getattr(self, '_trace_enabled', False):
+            with self._trace_lock:
+                self._trace_current = {'t_run_start': time.perf_counter()}
+        # Enqueue input
+        self._mark_trace('t_enqueued')
         self.input_queue.put(data)
         # Wait for the output thread to process the data
         self.data_ready.wait()
+        self._mark_trace('t_data_ready_unblocked')
+        self._mark_trace('t_run_end')
+        # Snapshot last trace
+        if getattr(self, '_trace_enabled', False):
+            with self._trace_lock:
+                self._last_trace = dict(self._trace_current or {})
         result_dict = {}
         
         # Handle multiple output parsing
@@ -700,7 +724,7 @@ class model:
         if "OUTPUT_CHANGE:" in output_line:
             output_line = output_line.split("OUTPUT_CHANGE:")[1].strip()
         
-        print(f"Output line: {output_line}")
+        print(f"Linia wyjściowa: {output_line}")
         # Split by comma to get individual key=value pairs
         pairs = output_line.split(",")
         
@@ -719,43 +743,41 @@ class model:
         
         return result_dict
 
-
     def stop_process(self):
-        print("Stopping process...")
+        print("Zatrzymywanie procesu...")
         self.running = False
         
-        print("Waiting for threads to finish...")
+        print("Czekanie na zakończenie wątków...")
         # Give the threads a chance to see that running is False
         time.sleep(0.5)
         
         if self.process and self.process.poll() is None:
-            print("Terminating process...")
+            print("Zakończenie procesu...")
             try:
                 self.process.terminate()
                 self.process.wait(timeout=1.0)
             except:
-                print("Force killing process...")
+                print("Przymusowe zakończenie procesu...")
                 self.process.kill()
                 
         if self.input_thread and self.input_thread.is_alive():
-            print("Joining input thread...")
+            print("Dołączanie wątku wejściowego...")
             self.input_thread.join(timeout=1.0)
             
         if hasattr(self, 'processing_thread') and self.processing_thread and self.processing_thread.is_alive():
-            print("Joining processing thread...")
+            print("Dołączanie wątku przetwarzającego...")
             self.processing_thread.join(timeout=1.0)
             
         if self.output_thread and self.output_thread.is_alive():
-            print("Joining output thread...")
+            print("Dołączanie wątku wyjściowego...")
             self.output_thread.join(timeout=1.0)
             
-        print("Model process stopped")
+        print("Proces modelu zakończony")
         pass
-
 
     def start_process(self):
         self.running = True
-        print(f"Starting process: {self.exe_file}")
+        print(f"Uruchamianie procesu: {self.exe_file}")
         self.process = subprocess.Popen([self.exe_file],
          stdin=subprocess.PIPE, 
          stdout=subprocess.PIPE, 
@@ -768,9 +790,9 @@ class model:
         if self.prefer_handles:
             ok = self._send_handshake_and_bind(timeout=1.0)
             if ok:
-                print("Handle-based protocol enabled")
+                print("Protokół uchwytów włączony")
             else:
-                print("Handle handshake failed or timed out; using legacy protocol")
+                print("Handshake uchwytów nie powiódł się lub przekroczono limit czasu; używany jest tryb legacy")
                 self.use_handles = False
         # Then start input/output threads
         self.input_thread = threading.Thread(target=self._input_thread)
@@ -790,8 +812,8 @@ class model:
         pass
 
     def _send_handshake_and_bind(self, timeout: float = 1.0) -> bool:
-        """Send HELLO/BIND and wait briefly for processing thread to complete handshake.
-        Returns True if handles are enabled, else False (legacy fallback).
+        """Wysyła HELLO/BIND i krótko czeka, aż wątek przetwarzający zakończy handshake.
+        Zwraca True, jeśli protokół uchwytów został aktywowany; w przeciwnym razie False (powrót do trybu legacy).
         """
         try:
             # Reset handshake state
@@ -815,11 +837,29 @@ class model:
                 return True
             return False
         except Exception as e:
-            print(f"Handshake error: {e}")
+            print(f"Błąd handshake: {e}")
             return False
 
     def get_stats(self):
         return dict(self.stats)
+
+    def enable_step_trace(self, enabled: bool):
+        self._trace_enabled = bool(enabled)
+
+    def get_last_trace(self):
+        with self._trace_lock:
+            return dict(self._last_trace) if self._last_trace else {}
+
+    def _mark_trace(self, key: str):
+        if not getattr(self, '_trace_enabled', False):
+            return
+        try:
+            with self._trace_lock:
+                tr = self._trace_current
+                if tr is not None and key not in tr:
+                    tr[key] = time.perf_counter()
+        except Exception:
+            pass
 
 if __name__ == "__main__":
     model = model("/Users/salsamon/Documents/Magisterka/multiplier.v", "/Users/salsamon/Documents/Magisterka/gr-OOT_HDL/python/OOT_HDL")

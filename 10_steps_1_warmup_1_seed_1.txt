@@ -1,0 +1,160 @@
+Debug: Port section found: 
+    input wire [31:0] data_in,
+    output wire [31:0] data_out,
+    input wire clk,
+    input wire rst
+...
+Debug: Found 4 port matches
+Debug: Processing match: ('input', 'wire', '31', 'data_in')
+Debug: Added port: data_in (input) size 32
+Debug: Processing match: ('output', 'wire', '31', 'data_out')
+Debug: Added port: data_out (output) size 32
+Debug: Processing match: ('input', 'wire', '', 'clk')
+Debug: Added port: clk (input) size 1
+Debug: Processing match: ('input', 'wire', '', 'rst')
+Debug: Added port: rst (input) size 1
+Has clock ports: True
+Wrapper output path: /Users/salsamon/Documents/Magisterka/benchfolder/multiplier_clk_wrapper.v
+
+=== Running mode: handle ===
+Starting process: /Users/salsamon/Documents/Magisterka/benchfolder/multiplier_clk_obj_dir/Vmultiplier_clk_wrapper
+Handle-based protocol enabled
+Input data: [1, 0, 1]
+[handles] Setting data_in=1, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [2, 1, 0]
+[handles] Setting data_in=2, clk=1, rst=0 and stepping 1
+Output line: data_out=4
+Input data: [3, 0, 1]
+[handles] Setting data_in=3, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [4, 1, 0]
+[handles] Setting data_in=4, clk=1, rst=0 and stepping 1
+Output line: data_out=8
+Input data: [5, 0, 1]
+[handles] Setting data_in=5, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [6, 1, 0]
+[handles] Setting data_in=6, clk=1, rst=0 and stepping 1
+Output line: data_out=12
+Input data: [7, 0, 1]
+[handles] Setting data_in=7, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [8, 1, 0]
+[handles] Setting data_in=8, clk=1, rst=0 and stepping 1
+Output line: data_out=16
+Input data: [9, 0, 1]
+[handles] Setting data_in=9, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [10, 1, 0]
+[handles] Setting data_in=10, clk=1, rst=0 and stepping 1
+Output line: data_out=20
+Stopping process...
+Waiting for threads to finish...
+Terminating process...
+Processing thread stopped
+Model process stopped
+steps: 9
+mean_step_s: 1.472817e-02
+median_s: 1.254171e-02
+p90_s: 2.137267e-02
+p99_s: 2.471054e-02
+min_s: 1.136304e-02
+max_s: 2.471054e-02
+throughput_steps_per_s: 67.90
+breakdown:
+queue_wait: mean_us=8347.6, p50_us=10234.6, p90_us=11475.9, p99_us=12039.2
+input_write: mean_us=27.0, p50_us=22.6, p90_us=38.6, p99_us=47.0
+step_send: mean_us=8.2, p50_us=4.1, p90_us=14.3, p99_us=27.6
+model_to_output: mean_us=51.3, p50_us=54.8, p90_us=66.8, p99_us=76.7
+output_queue: mean_us=16.5, p50_us=14.0, p90_us=28.3, p99_us=28.7
+output_dequeue_wait: mean_us=6192.8, p50_us=2861.7, p90_us=12446.8, p99_us=12495.0
+notify_set: mean_us=1.7, p50_us=1.9, p90_us=2.6, p99_us=3.0
+wait_unblock: mean_us=26.9, p50_us=25.7, p90_us=35.5, p99_us=41.3
+run_total: mean_us=14690.5, p50_us=12475.6, p90_us=21342.1, p99_us=24629.1
+bytes_out_total: 254
+bytes_in_total: 168
+lines_out_total: 22
+lines_in_total: 16
+bytes_out_per_step: 28.22222222222222
+bytes_in_per_step: 18.666666666666668
+lines_out_per_step: 2.4444444444444446
+lines_in_per_step: 1.7777777777777777
+
+=== Running mode: legacy ===
+Starting process: /Users/salsamon/Documents/Magisterka/benchfolder/multiplier_clk_obj_dir/Vmultiplier_clk_wrapper
+Input data: [1, 0, 1]
+Log parts: ['data_in=1', 'clk=0', 'rst=1']
+Setting data_in=1, clk=0, rst=1
+Output line: data_out=0,
+Input data: [2, 1, 0]
+Log parts: ['data_in=2', 'clk=1', 'rst=0']
+Setting data_in=2, clk=1, rst=0
+Output line: data_out=4,
+Input data: [3, 0, 1]
+Log parts: ['data_in=3', 'clk=0', 'rst=1']
+Setting data_in=3, clk=0, rst=1
+Output line: data_out=0,
+Input data: [4, 1, 0]
+Log parts: ['data_in=4', 'clk=1', 'rst=0']
+Setting data_in=4, clk=1, rst=0
+Output line: data_out=8,
+Input data: [5, 0, 1]
+Log parts: ['data_in=5', 'clk=0', 'rst=1']
+Setting data_in=5, clk=0, rst=1
+Output line: data_out=0,
+Input data: [6, 1, 0]
+Log parts: ['data_in=6', 'clk=1', 'rst=0']
+Setting data_in=6, clk=1, rst=0
+Output line: data_out=12,
+Input data: [7, 0, 1]
+Log parts: ['data_in=7', 'clk=0', 'rst=1']
+Setting data_in=7, clk=0, rst=1
+Output line: data_out=0,
+Input data: [8, 1, 0]
+Log parts: ['data_in=8', 'clk=1', 'rst=0']
+Setting data_in=8, clk=1, rst=0
+Output line: data_out=16,
+Input data: [9, 0, 1]
+Log parts: ['data_in=9', 'clk=0', 'rst=1']
+Setting data_in=9, clk=0, rst=1
+Output line: data_out=0,
+Input data: [10, 1, 0]
+Log parts: ['data_in=10', 'clk=1', 'rst=0']
+Setting data_in=10, clk=1, rst=0
+Output line: data_out=20,
+Stopping process...
+Waiting for threads to finish...
+Terminating process...
+Processing thread stopped
+Model process stopped
+steps: 9
+mean_step_s: 1.267388e-02
+median_s: 1.127737e-02
+p90_s: 1.257121e-02
+p99_s: 2.373171e-02
+min_s: 1.027600e-02
+max_s: 2.373171e-02
+throughput_steps_per_s: 78.90
+breakdown:
+queue_wait: mean_us=6527.9, p50_us=5466.1, p90_us=11082.1, p99_us=12147.3
+input_write: mean_us=50.7, p50_us=51.3, p90_us=57.8, p99_us=65.7
+step_send: n/a
+model_to_output: mean_us=80.9, p50_us=74.6, p90_us=84.9, p99_us=154.0
+output_queue: mean_us=14.0, p50_us=13.1, p90_us=16.9, p99_us=31.0
+output_dequeue_wait: mean_us=5875.7, p50_us=6985.5, p90_us=9673.3, p99_us=11269.0
+notify_set: mean_us=3.4, p50_us=3.4, p90_us=4.9, p99_us=4.9
+wait_unblock: mean_us=45.4, p50_us=38.4, p90_us=46.6, p99_us=121.0
+run_total: mean_us=12628.7, p50_us=11250.7, p90_us=12524.2, p99_us=23686.3
+bytes_out_total: 61
+bytes_in_total: 123
+lines_out_total: 10
+lines_in_total: 10
+bytes_out_per_step: 6.777777777777778
+bytes_in_per_step: 13.666666666666666
+lines_out_per_step: 1.1111111111111112
+lines_in_per_step: 1.1111111111111112
+
+=== Summary ===
+handle: steps=9, throughput=67.90 steps/s, bytes_out=254, bytes_in=168
+legacy: steps=9, throughput=78.90 steps/s, bytes_out=61, bytes_in=123

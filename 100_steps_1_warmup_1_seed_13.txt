@@ -1,0 +1,792 @@
+Debug: Port section found: 
+    input wire [31:0] data_in,
+    output wire [31:0] data_out,
+    input wire clk,
+    input wire rst
+...
+Debug: Found 4 port matches
+Debug: Processing match: ('input', 'wire', '31', 'data_in')
+Debug: Added port: data_in (input) size 32
+Debug: Processing match: ('output', 'wire', '31', 'data_out')
+Debug: Added port: data_out (output) size 32
+Debug: Processing match: ('input', 'wire', '', 'clk')
+Debug: Added port: clk (input) size 1
+Debug: Processing match: ('input', 'wire', '', 'rst')
+Debug: Added port: rst (input) size 1
+Has clock ports: True
+Wrapper output path: /Users/salsamon/Documents/Magisterka/benchfolder/multiplier_clk_wrapper.v
+
+=== Running mode: handle ===
+Starting process: /Users/salsamon/Documents/Magisterka/benchfolder/multiplier_clk_obj_dir/Vmultiplier_clk_wrapper
+Handle-based protocol enabled
+Input data: [13, 0, 1]
+[handles] Setting data_in=13, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [14, 1, 0]
+[handles] Setting data_in=14, clk=1, rst=0 and stepping 1
+Output line: data_out=28
+Input data: [15, 0, 1]
+[handles] Setting data_in=15, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [16, 1, 0]
+[handles] Setting data_in=16, clk=1, rst=0 and stepping 1
+Output line: data_out=32
+Input data: [17, 0, 1]
+[handles] Setting data_in=17, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [18, 1, 0]
+[handles] Setting data_in=18, clk=1, rst=0 and stepping 1
+Output line: data_out=36
+Input data: [19, 0, 1]
+[handles] Setting data_in=19, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [20, 1, 0]
+[handles] Setting data_in=20, clk=1, rst=0 and stepping 1
+Output line: data_out=40
+Input data: [21, 0, 1]
+[handles] Setting data_in=21, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [22, 1, 0]
+[handles] Setting data_in=22, clk=1, rst=0 and stepping 1
+Output line: data_out=44
+Input data: [23, 0, 1]
+[handles] Setting data_in=23, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [24, 1, 0]
+[handles] Setting data_in=24, clk=1, rst=0 and stepping 1
+Output line: data_out=48
+Input data: [25, 0, 1]
+[handles] Setting data_in=25, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [26, 1, 0]
+[handles] Setting data_in=26, clk=1, rst=0 and stepping 1
+Output line: data_out=52
+Input data: [27, 0, 1]
+[handles] Setting data_in=27, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [28, 1, 0]
+[handles] Setting data_in=28, clk=1, rst=0 and stepping 1
+Output line: data_out=56
+Input data: [29, 0, 1]
+[handles] Setting data_in=29, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [30, 1, 0]
+[handles] Setting data_in=30, clk=1, rst=0 and stepping 1
+Output line: data_out=60
+Input data: [31, 0, 1]
+[handles] Setting data_in=31, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [32, 1, 0]
+[handles] Setting data_in=32, clk=1, rst=0 and stepping 1
+Output line: data_out=64
+Input data: [33, 0, 1]
+[handles] Setting data_in=33, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [34, 1, 0]
+[handles] Setting data_in=34, clk=1, rst=0 and stepping 1
+Output line: data_out=68
+Input data: [35, 0, 1]
+[handles] Setting data_in=35, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [36, 1, 0]
+[handles] Setting data_in=36, clk=1, rst=0 and stepping 1
+Output line: data_out=72
+Input data: [37, 0, 1]
+[handles] Setting data_in=37, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [38, 1, 0]
+[handles] Setting data_in=38, clk=1, rst=0 and stepping 1
+Output line: data_out=76
+Input data: [39, 0, 1]
+[handles] Setting data_in=39, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [40, 1, 0]
+[handles] Setting data_in=40, clk=1, rst=0 and stepping 1
+Output line: data_out=80
+Input data: [41, 0, 1]
+[handles] Setting data_in=41, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [42, 1, 0]
+[handles] Setting data_in=42, clk=1, rst=0 and stepping 1
+Output line: data_out=84
+Input data: [43, 0, 1]
+[handles] Setting data_in=43, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [44, 1, 0]
+[handles] Setting data_in=44, clk=1, rst=0 and stepping 1
+Output line: data_out=88
+Input data: [45, 0, 1]
+[handles] Setting data_in=45, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [46, 1, 0]
+[handles] Setting data_in=46, clk=1, rst=0 and stepping 1
+Output line: data_out=92
+Input data: [47, 0, 1]
+[handles] Setting data_in=47, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [48, 1, 0]
+[handles] Setting data_in=48, clk=1, rst=0 and stepping 1
+Output line: data_out=96
+Input data: [49, 0, 1]
+[handles] Setting data_in=49, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [50, 1, 0]
+[handles] Setting data_in=50, clk=1, rst=0 and stepping 1
+Output line: data_out=100
+Input data: [51, 0, 1]
+[handles] Setting data_in=51, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [52, 1, 0]
+[handles] Setting data_in=52, clk=1, rst=0 and stepping 1
+Output line: data_out=104
+Input data: [53, 0, 1]
+[handles] Setting data_in=53, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [54, 1, 0]
+[handles] Setting data_in=54, clk=1, rst=0 and stepping 1
+Output line: data_out=108
+Input data: [55, 0, 1]
+[handles] Setting data_in=55, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [56, 1, 0]
+[handles] Setting data_in=56, clk=1, rst=0 and stepping 1
+Output line: data_out=112
+Input data: [57, 0, 1]
+[handles] Setting data_in=57, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [58, 1, 0]
+[handles] Setting data_in=58, clk=1, rst=0 and stepping 1
+Output line: data_out=116
+Input data: [59, 0, 1]
+[handles] Setting data_in=59, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [60, 1, 0]
+[handles] Setting data_in=60, clk=1, rst=0 and stepping 1
+Output line: data_out=120
+Input data: [61, 0, 1]
+[handles] Setting data_in=61, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [62, 1, 0]
+[handles] Setting data_in=62, clk=1, rst=0 and stepping 1
+Output line: data_out=124
+Input data: [63, 0, 1]
+[handles] Setting data_in=63, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [64, 1, 0]
+[handles] Setting data_in=64, clk=1, rst=0 and stepping 1
+Output line: data_out=128
+Input data: [65, 0, 1]
+[handles] Setting data_in=65, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [66, 1, 0]
+[handles] Setting data_in=66, clk=1, rst=0 and stepping 1
+Output line: data_out=132
+Input data: [67, 0, 1]
+[handles] Setting data_in=67, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [68, 1, 0]
+[handles] Setting data_in=68, clk=1, rst=0 and stepping 1
+Output line: data_out=136
+Input data: [69, 0, 1]
+[handles] Setting data_in=69, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [70, 1, 0]
+[handles] Setting data_in=70, clk=1, rst=0 and stepping 1
+Output line: data_out=140
+Input data: [71, 0, 1]
+[handles] Setting data_in=71, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [72, 1, 0]
+[handles] Setting data_in=72, clk=1, rst=0 and stepping 1
+Output line: data_out=144
+Input data: [73, 0, 1]
+[handles] Setting data_in=73, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [74, 1, 0]
+[handles] Setting data_in=74, clk=1, rst=0 and stepping 1
+Output line: data_out=148
+Input data: [75, 0, 1]
+[handles] Setting data_in=75, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [76, 1, 0]
+[handles] Setting data_in=76, clk=1, rst=0 and stepping 1
+Output line: data_out=152
+Input data: [77, 0, 1]
+[handles] Setting data_in=77, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [78, 1, 0]
+[handles] Setting data_in=78, clk=1, rst=0 and stepping 1
+Output line: data_out=156
+Input data: [79, 0, 1]
+[handles] Setting data_in=79, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [80, 1, 0]
+[handles] Setting data_in=80, clk=1, rst=0 and stepping 1
+Output line: data_out=160
+Input data: [81, 0, 1]
+[handles] Setting data_in=81, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [82, 1, 0]
+[handles] Setting data_in=82, clk=1, rst=0 and stepping 1
+Output line: data_out=164
+Input data: [83, 0, 1]
+[handles] Setting data_in=83, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [84, 1, 0]
+[handles] Setting data_in=84, clk=1, rst=0 and stepping 1
+Output line: data_out=168
+Input data: [85, 0, 1]
+[handles] Setting data_in=85, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [86, 1, 0]
+[handles] Setting data_in=86, clk=1, rst=0 and stepping 1
+Output line: data_out=172
+Input data: [87, 0, 1]
+[handles] Setting data_in=87, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [88, 1, 0]
+[handles] Setting data_in=88, clk=1, rst=0 and stepping 1
+Output line: data_out=176
+Input data: [89, 0, 1]
+[handles] Setting data_in=89, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [90, 1, 0]
+[handles] Setting data_in=90, clk=1, rst=0 and stepping 1
+Output line: data_out=180
+Input data: [91, 0, 1]
+[handles] Setting data_in=91, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [92, 1, 0]
+[handles] Setting data_in=92, clk=1, rst=0 and stepping 1
+Output line: data_out=184
+Input data: [93, 0, 1]
+[handles] Setting data_in=93, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [94, 1, 0]
+[handles] Setting data_in=94, clk=1, rst=0 and stepping 1
+Output line: data_out=188
+Input data: [95, 0, 1]
+[handles] Setting data_in=95, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [96, 1, 0]
+[handles] Setting data_in=96, clk=1, rst=0 and stepping 1
+Output line: data_out=192
+Input data: [97, 0, 1]
+[handles] Setting data_in=97, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [98, 1, 0]
+[handles] Setting data_in=98, clk=1, rst=0 and stepping 1
+Output line: data_out=196
+Input data: [99, 0, 1]
+[handles] Setting data_in=99, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [100, 1, 0]
+[handles] Setting data_in=100, clk=1, rst=0 and stepping 1
+Output line: data_out=200
+Input data: [101, 0, 1]
+[handles] Setting data_in=101, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [102, 1, 0]
+[handles] Setting data_in=102, clk=1, rst=0 and stepping 1
+Output line: data_out=204
+Input data: [103, 0, 1]
+[handles] Setting data_in=103, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [104, 1, 0]
+[handles] Setting data_in=104, clk=1, rst=0 and stepping 1
+Output line: data_out=208
+Input data: [105, 0, 1]
+[handles] Setting data_in=105, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [106, 1, 0]
+[handles] Setting data_in=106, clk=1, rst=0 and stepping 1
+Output line: data_out=212
+Input data: [107, 0, 1]
+[handles] Setting data_in=107, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [108, 1, 0]
+[handles] Setting data_in=108, clk=1, rst=0 and stepping 1
+Output line: data_out=216
+Input data: [109, 0, 1]
+[handles] Setting data_in=109, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [110, 1, 0]
+[handles] Setting data_in=110, clk=1, rst=0 and stepping 1
+Output line: data_out=220
+Input data: [111, 0, 1]
+[handles] Setting data_in=111, clk=0, rst=1 and stepping 1
+Output line: data_out=0
+Input data: [112, 1, 0]
+[handles] Setting data_in=112, clk=1, rst=0 and stepping 1
+Output line: data_out=224
+Stopping process...
+Waiting for threads to finish...
+Terminating process...
+Processing thread stopped
+Model process stopped
+steps: 99
+mean_step_s: 1.281354e-02
+median_s: 1.247096e-02
+p90_s: 1.267712e-02
+p99_s: 2.370208e-02
+min_s: 1.000571e-02
+max_s: 2.490771e-02
+throughput_steps_per_s: 78.04
+breakdown:
+queue_wait: mean_us=4889.1, p50_us=4201.1, p90_us=10408.3, p99_us=12449.9
+input_write: mean_us=29.6, p50_us=19.5, p90_us=50.0, p99_us=121.8
+step_send: mean_us=5.7, p50_us=2.5, p90_us=11.4, p99_us=56.2
+model_to_output: mean_us=56.1, p50_us=42.0, p90_us=91.1, p99_us=185.3
+output_queue: mean_us=18.4, p50_us=10.5, p90_us=28.5, p99_us=74.8
+output_dequeue_wait: mean_us=7739.6, p50_us=8181.9, p90_us=11087.7, p99_us=12430.6
+notify_set: mean_us=4.1, p50_us=1.4, p90_us=3.1, p99_us=34.8
+wait_unblock: mean_us=25.7, p50_us=18.4, p90_us=45.7, p99_us=109.1
+
+bytes_out_total: 2526
+bytes_in_total: 967
+lines_out_total: 202
+lines_in_total: 106
+bytes_out_per_step: 25.515151515151516
+bytes_in_per_step: 9.767676767676768
+lines_out_per_step: 2.04040404040404
+lines_in_per_step: 1.0707070707070707
+
+=== Running mode: legacy ===
+Starting process: /Users/salsamon/Documents/Magisterka/benchfolder/multiplier_clk_obj_dir/Vmultiplier_clk_wrapper
+Input data: [13, 0, 1]
+Log parts: ['data_in=13', 'clk=0', 'rst=1']
+Setting data_in=13, clk=0, rst=1
+Output line: data_out=0,
+Input data: [14, 1, 0]
+Log parts: ['data_in=14', 'clk=1', 'rst=0']
+Setting data_in=14, clk=1, rst=0
+Output line: data_out=28,
+Input data: [15, 0, 1]
+Log parts: ['data_in=15', 'clk=0', 'rst=1']
+Setting data_in=15, clk=0, rst=1
+Output line: data_out=0,
+Input data: [16, 1, 0]
+Log parts: ['data_in=16', 'clk=1', 'rst=0']
+Setting data_in=16, clk=1, rst=0
+Output line: data_out=32,
+Input data: [17, 0, 1]
+Log parts: ['data_in=17', 'clk=0', 'rst=1']
+Setting data_in=17, clk=0, rst=1
+Output line: data_out=0,
+Input data: [18, 1, 0]
+Log parts: ['data_in=18', 'clk=1', 'rst=0']
+Setting data_in=18, clk=1, rst=0
+Output line: data_out=36,
+Input data: [19, 0, 1]
+Log parts: ['data_in=19', 'clk=0', 'rst=1']
+Setting data_in=19, clk=0, rst=1
+Output line: data_out=0,
+Input data: [20, 1, 0]
+Log parts: ['data_in=20', 'clk=1', 'rst=0']
+Setting data_in=20, clk=1, rst=0
+Output line: data_out=40,
+Input data: [21, 0, 1]
+Log parts: ['data_in=21', 'clk=0', 'rst=1']
+Setting data_in=21, clk=0, rst=1
+Output line: data_out=0,
+Input data: [22, 1, 0]
+Log parts: ['data_in=22', 'clk=1', 'rst=0']
+Setting data_in=22, clk=1, rst=0
+Output line: data_out=44,
+Input data: [23, 0, 1]
+Log parts: ['data_in=23', 'clk=0', 'rst=1']
+Setting data_in=23, clk=0, rst=1
+Output line: data_out=0,
+Input data: [24, 1, 0]
+Log parts: ['data_in=24', 'clk=1', 'rst=0']
+Setting data_in=24, clk=1, rst=0
+Output line: data_out=48,
+Input data: [25, 0, 1]
+Log parts: ['data_in=25', 'clk=0', 'rst=1']
+Setting data_in=25, clk=0, rst=1
+Output line: data_out=0,
+Input data: [26, 1, 0]
+Log parts: ['data_in=26', 'clk=1', 'rst=0']
+Setting data_in=26, clk=1, rst=0
+Output line: data_out=52,
+Input data: [27, 0, 1]
+Log parts: ['data_in=27', 'clk=0', 'rst=1']
+Setting data_in=27, clk=0, rst=1
+Output line: data_out=0,
+Input data: [28, 1, 0]
+Log parts: ['data_in=28', 'clk=1', 'rst=0']
+Setting data_in=28, clk=1, rst=0
+Output line: data_out=56,
+Input data: [29, 0, 1]
+Log parts: ['data_in=29', 'clk=0', 'rst=1']
+Setting data_in=29, clk=0, rst=1
+Output line: data_out=0,
+Input data: [30, 1, 0]
+Log parts: ['data_in=30', 'clk=1', 'rst=0']
+Setting data_in=30, clk=1, rst=0
+Output line: data_out=60,
+Input data: [31, 0, 1]
+Log parts: ['data_in=31', 'clk=0', 'rst=1']
+Setting data_in=31, clk=0, rst=1
+Output line: data_out=0,
+Input data: [32, 1, 0]
+Log parts: ['data_in=32', 'clk=1', 'rst=0']
+Setting data_in=32, clk=1, rst=0
+Output line: data_out=64,
+Input data: [33, 0, 1]
+Log parts: ['data_in=33', 'clk=0', 'rst=1']
+Setting data_in=33, clk=0, rst=1
+Output line: data_out=0,
+Input data: [34, 1, 0]
+Log parts: ['data_in=34', 'clk=1', 'rst=0']
+Setting data_in=34, clk=1, rst=0
+Output line: data_out=68,
+Input data: [35, 0, 1]
+Log parts: ['data_in=35', 'clk=0', 'rst=1']
+Setting data_in=35, clk=0, rst=1
+Output line: data_out=0,
+Input data: [36, 1, 0]
+Log parts: ['data_in=36', 'clk=1', 'rst=0']
+Setting data_in=36, clk=1, rst=0
+Output line: data_out=72,
+Input data: [37, 0, 1]
+Log parts: ['data_in=37', 'clk=0', 'rst=1']
+Setting data_in=37, clk=0, rst=1
+Output line: data_out=0,
+Input data: [38, 1, 0]
+Log parts: ['data_in=38', 'clk=1', 'rst=0']
+Setting data_in=38, clk=1, rst=0
+Output line: data_out=76,
+Input data: [39, 0, 1]
+Log parts: ['data_in=39', 'clk=0', 'rst=1']
+Setting data_in=39, clk=0, rst=1
+Output line: data_out=0,
+Input data: [40, 1, 0]
+Log parts: ['data_in=40', 'clk=1', 'rst=0']
+Setting data_in=40, clk=1, rst=0
+Output line: data_out=80,
+Input data: [41, 0, 1]
+Log parts: ['data_in=41', 'clk=0', 'rst=1']
+Setting data_in=41, clk=0, rst=1
+Output line: data_out=0,
+Input data: [42, 1, 0]
+Log parts: ['data_in=42', 'clk=1', 'rst=0']
+Setting data_in=42, clk=1, rst=0
+Output line: data_out=84,
+Input data: [43, 0, 1]
+Log parts: ['data_in=43', 'clk=0', 'rst=1']
+Setting data_in=43, clk=0, rst=1
+Output line: data_out=0,
+Input data: [44, 1, 0]
+Log parts: ['data_in=44', 'clk=1', 'rst=0']
+Setting data_in=44, clk=1, rst=0
+Output line: data_out=88,
+Input data: [45, 0, 1]
+Log parts: ['data_in=45', 'clk=0', 'rst=1']
+Setting data_in=45, clk=0, rst=1
+Output line: data_out=0,
+Input data: [46, 1, 0]
+Log parts: ['data_in=46', 'clk=1', 'rst=0']
+Setting data_in=46, clk=1, rst=0
+Output line: data_out=92,
+Input data: [47, 0, 1]
+Log parts: ['data_in=47', 'clk=0', 'rst=1']
+Setting data_in=47, clk=0, rst=1
+Output line: data_out=0,
+Input data: [48, 1, 0]
+Log parts: ['data_in=48', 'clk=1', 'rst=0']
+Setting data_in=48, clk=1, rst=0
+Output line: data_out=96,
+Input data: [49, 0, 1]
+Log parts: ['data_in=49', 'clk=0', 'rst=1']
+Setting data_in=49, clk=0, rst=1
+Output line: data_out=0,
+Input data: [50, 1, 0]
+Log parts: ['data_in=50', 'clk=1', 'rst=0']
+Setting data_in=50, clk=1, rst=0
+Output line: data_out=100,
+Input data: [51, 0, 1]
+Log parts: ['data_in=51', 'clk=0', 'rst=1']
+Setting data_in=51, clk=0, rst=1
+Output line: data_out=0,
+Input data: [52, 1, 0]
+Log parts: ['data_in=52', 'clk=1', 'rst=0']
+Setting data_in=52, clk=1, rst=0
+Output line: data_out=104,
+Input data: [53, 0, 1]
+Log parts: ['data_in=53', 'clk=0', 'rst=1']
+Setting data_in=53, clk=0, rst=1
+Output line: data_out=0,
+Input data: [54, 1, 0]
+Log parts: ['data_in=54', 'clk=1', 'rst=0']
+Setting data_in=54, clk=1, rst=0
+Output line: data_out=108,
+Input data: [55, 0, 1]
+Log parts: ['data_in=55', 'clk=0', 'rst=1']
+Setting data_in=55, clk=0, rst=1
+Output line: data_out=0,
+Input data: [56, 1, 0]
+Log parts: ['data_in=56', 'clk=1', 'rst=0']
+Setting data_in=56, clk=1, rst=0
+Output line: data_out=112,
+Input data: [57, 0, 1]
+Log parts: ['data_in=57', 'clk=0', 'rst=1']
+Setting data_in=57, clk=0, rst=1
+Output line: data_out=0,
+Input data: [58, 1, 0]
+Log parts: ['data_in=58', 'clk=1', 'rst=0']
+Setting data_in=58, clk=1, rst=0
+Output line: data_out=116,
+Input data: [59, 0, 1]
+Log parts: ['data_in=59', 'clk=0', 'rst=1']
+Setting data_in=59, clk=0, rst=1
+Output line: data_out=0,
+Input data: [60, 1, 0]
+Log parts: ['data_in=60', 'clk=1', 'rst=0']
+Setting data_in=60, clk=1, rst=0
+Output line: data_out=120,
+Input data: [61, 0, 1]
+Log parts: ['data_in=61', 'clk=0', 'rst=1']
+Setting data_in=61, clk=0, rst=1
+Output line: data_out=0,
+Input data: [62, 1, 0]
+Log parts: ['data_in=62', 'clk=1', 'rst=0']
+Setting data_in=62, clk=1, rst=0
+Output line: data_out=124,
+Input data: [63, 0, 1]
+Log parts: ['data_in=63', 'clk=0', 'rst=1']
+Setting data_in=63, clk=0, rst=1
+Output line: data_out=0,
+Input data: [64, 1, 0]
+Log parts: ['data_in=64', 'clk=1', 'rst=0']
+Setting data_in=64, clk=1, rst=0
+Output line: data_out=128,
+Input data: [65, 0, 1]
+Log parts: ['data_in=65', 'clk=0', 'rst=1']
+Setting data_in=65, clk=0, rst=1
+Output line: data_out=0,
+Input data: [66, 1, 0]
+Log parts: ['data_in=66', 'clk=1', 'rst=0']
+Setting data_in=66, clk=1, rst=0
+Output line: data_out=132,
+Input data: [67, 0, 1]
+Log parts: ['data_in=67', 'clk=0', 'rst=1']
+Setting data_in=67, clk=0, rst=1
+Output line: data_out=0,
+Input data: [68, 1, 0]
+Log parts: ['data_in=68', 'clk=1', 'rst=0']
+Setting data_in=68, clk=1, rst=0
+Output line: data_out=136,
+Input data: [69, 0, 1]
+Log parts: ['data_in=69', 'clk=0', 'rst=1']
+Setting data_in=69, clk=0, rst=1
+Output line: data_out=0,
+Input data: [70, 1, 0]
+Log parts: ['data_in=70', 'clk=1', 'rst=0']
+Setting data_in=70, clk=1, rst=0
+Output line: data_out=140,
+Input data: [71, 0, 1]
+Log parts: ['data_in=71', 'clk=0', 'rst=1']
+Setting data_in=71, clk=0, rst=1
+Output line: data_out=0,
+Input data: [72, 1, 0]
+Log parts: ['data_in=72', 'clk=1', 'rst=0']
+Setting data_in=72, clk=1, rst=0
+Output line: data_out=144,
+Input data: [73, 0, 1]
+Log parts: ['data_in=73', 'clk=0', 'rst=1']
+Setting data_in=73, clk=0, rst=1
+Output line: data_out=0,
+Input data: [74, 1, 0]
+Log parts: ['data_in=74', 'clk=1', 'rst=0']
+Setting data_in=74, clk=1, rst=0
+Output line: data_out=148,
+Input data: [75, 0, 1]
+Log parts: ['data_in=75', 'clk=0', 'rst=1']
+Setting data_in=75, clk=0, rst=1
+Output line: data_out=0,
+Input data: [76, 1, 0]
+Log parts: ['data_in=76', 'clk=1', 'rst=0']
+Setting data_in=76, clk=1, rst=0
+Output line: data_out=152,
+Input data: [77, 0, 1]
+Log parts: ['data_in=77', 'clk=0', 'rst=1']
+Setting data_in=77, clk=0, rst=1
+Output line: data_out=0,
+Input data: [78, 1, 0]
+Log parts: ['data_in=78', 'clk=1', 'rst=0']
+Setting data_in=78, clk=1, rst=0
+Output line: data_out=156,
+Input data: [79, 0, 1]
+Log parts: ['data_in=79', 'clk=0', 'rst=1']
+Setting data_in=79, clk=0, rst=1
+Output line: data_out=0,
+Input data: [80, 1, 0]
+Log parts: ['data_in=80', 'clk=1', 'rst=0']
+Setting data_in=80, clk=1, rst=0
+Output line: data_out=160,
+Input data: [81, 0, 1]
+Log parts: ['data_in=81', 'clk=0', 'rst=1']
+Setting data_in=81, clk=0, rst=1
+Output line: data_out=0,
+Input data: [82, 1, 0]
+Log parts: ['data_in=82', 'clk=1', 'rst=0']
+Setting data_in=82, clk=1, rst=0
+Output line: data_out=164,
+Input data: [83, 0, 1]
+Log parts: ['data_in=83', 'clk=0', 'rst=1']
+Setting data_in=83, clk=0, rst=1
+Output line: data_out=0,
+Input data: [84, 1, 0]
+Log parts: ['data_in=84', 'clk=1', 'rst=0']
+Setting data_in=84, clk=1, rst=0
+Output line: data_out=168,
+Input data: [85, 0, 1]
+Log parts: ['data_in=85', 'clk=0', 'rst=1']
+Setting data_in=85, clk=0, rst=1
+Output line: data_out=0,
+Input data: [86, 1, 0]
+Log parts: ['data_in=86', 'clk=1', 'rst=0']
+Setting data_in=86, clk=1, rst=0
+Output line: data_out=172,
+Input data: [87, 0, 1]
+Log parts: ['data_in=87', 'clk=0', 'rst=1']
+Setting data_in=87, clk=0, rst=1
+Output line: data_out=0,
+Input data: [88, 1, 0]
+Log parts: ['data_in=88', 'clk=1', 'rst=0']
+Setting data_in=88, clk=1, rst=0
+Output line: data_out=176,
+Input data: [89, 0, 1]
+Log parts: ['data_in=89', 'clk=0', 'rst=1']
+Setting data_in=89, clk=0, rst=1
+Output line: data_out=0,
+Input data: [90, 1, 0]
+Log parts: ['data_in=90', 'clk=1', 'rst=0']
+Setting data_in=90, clk=1, rst=0
+Output line: data_out=180,
+Input data: [91, 0, 1]
+Log parts: ['data_in=91', 'clk=0', 'rst=1']
+Setting data_in=91, clk=0, rst=1
+Output line: data_out=0,
+Input data: [92, 1, 0]
+Log parts: ['data_in=92', 'clk=1', 'rst=0']
+Setting data_in=92, clk=1, rst=0
+Output line: data_out=184,
+Input data: [93, 0, 1]
+Log parts: ['data_in=93', 'clk=0', 'rst=1']
+Setting data_in=93, clk=0, rst=1
+Output line: data_out=0,
+Input data: [94, 1, 0]
+Log parts: ['data_in=94', 'clk=1', 'rst=0']
+Setting data_in=94, clk=1, rst=0
+Output line: data_out=188,
+Input data: [95, 0, 1]
+Log parts: ['data_in=95', 'clk=0', 'rst=1']
+Setting data_in=95, clk=0, rst=1
+Output line: data_out=0,
+Input data: [96, 1, 0]
+Log parts: ['data_in=96', 'clk=1', 'rst=0']
+Setting data_in=96, clk=1, rst=0
+Output line: data_out=192,
+Input data: [97, 0, 1]
+Log parts: ['data_in=97', 'clk=0', 'rst=1']
+Setting data_in=97, clk=0, rst=1
+Output line: data_out=0,
+Input data: [98, 1, 0]
+Log parts: ['data_in=98', 'clk=1', 'rst=0']
+Setting data_in=98, clk=1, rst=0
+Output line: data_out=196,
+Input data: [99, 0, 1]
+Log parts: ['data_in=99', 'clk=0', 'rst=1']
+Setting data_in=99, clk=0, rst=1
+Output line: data_out=0,
+Input data: [100, 1, 0]
+Log parts: ['data_in=100', 'clk=1', 'rst=0']
+Setting data_in=100, clk=1, rst=0
+Output line: data_out=200,
+Input data: [101, 0, 1]
+Log parts: ['data_in=101', 'clk=0', 'rst=1']
+Setting data_in=101, clk=0, rst=1
+Output line: data_out=0,
+Input data: [102, 1, 0]
+Log parts: ['data_in=102', 'clk=1', 'rst=0']
+Setting data_in=102, clk=1, rst=0
+Output line: data_out=204,
+Input data: [103, 0, 1]
+Log parts: ['data_in=103', 'clk=0', 'rst=1']
+Setting data_in=103, clk=0, rst=1
+Output line: data_out=0,
+Input data: [104, 1, 0]
+Log parts: ['data_in=104', 'clk=1', 'rst=0']
+Setting data_in=104, clk=1, rst=0
+Output line: data_out=208,
+Input data: [105, 0, 1]
+Log parts: ['data_in=105', 'clk=0', 'rst=1']
+Setting data_in=105, clk=0, rst=1
+Output line: data_out=0,
+Input data: [106, 1, 0]
+Log parts: ['data_in=106', 'clk=1', 'rst=0']
+Setting data_in=106, clk=1, rst=0
+Output line: data_out=212,
+Input data: [107, 0, 1]
+Log parts: ['data_in=107', 'clk=0', 'rst=1']
+Setting data_in=107, clk=0, rst=1
+Output line: data_out=0,
+Input data: [108, 1, 0]
+Log parts: ['data_in=108', 'clk=1', 'rst=0']
+Setting data_in=108, clk=1, rst=0
+Output line: data_out=216,
+Input data: [109, 0, 1]
+Log parts: ['data_in=109', 'clk=0', 'rst=1']
+Setting data_in=109, clk=0, rst=1
+Output line: data_out=0,
+Input data: [110, 1, 0]
+Log parts: ['data_in=110', 'clk=1', 'rst=0']
+Setting data_in=110, clk=1, rst=0
+Output line: data_out=220,
+Input data: [111, 0, 1]
+Log parts: ['data_in=111', 'clk=0', 'rst=1']
+Setting data_in=111, clk=0, rst=1
+Output line: data_out=0,
+Input data: [112, 1, 0]
+Log parts: ['data_in=112', 'clk=1', 'rst=0']
+Setting data_in=112, clk=1, rst=0
+Output line: data_out=224,
+Stopping process...
+Waiting for threads to finish...
+Terminating process...
+Processing thread stopped
+Model process stopped
+steps: 99
+mean_step_s: 1.352013e-02
+median_s: 1.222238e-02
+p90_s: 1.260175e-02
+p99_s: 6.300046e-02
+min_s: 8.137500e-04
+max_s: 6.446467e-02
+throughput_steps_per_s: 73.96
+breakdown:
+queue_wait: mean_us=5735.8, p50_us=5217.1, p90_us=9925.2, p99_us=23321.2
+input_write: mean_us=37.8, p50_us=37.3, p90_us=64.5, p99_us=99.6
+step_send: n/a
+model_to_output: mean_us=73.7, p50_us=57.3, p90_us=95.5, p99_us=384.5
+output_queue: mean_us=8.8, p50_us=6.8, p90_us=13.6, p99_us=45.2
+output_dequeue_wait: mean_us=7163.5, p50_us=7341.8, p90_us=10370.1, p99_us=12123.6
+notify_set: mean_us=13.4, p50_us=2.0, p90_us=3.5, p99_us=14.5
+wait_unblock: mean_us=175.4, p50_us=29.8, p90_us=48.7, p99_us=2601.7
+
+bytes_out_total: 713
+bytes_in_total: 1282
+lines_out_total: 100
+lines_in_total: 100
+bytes_out_per_step: 7.202020202020202
+bytes_in_per_step: 12.94949494949495
+lines_out_per_step: 1.0101010101010102
+lines_in_per_step: 1.0101010101010102
+
+=== Summary ===
+handle: steps=99, throughput=78.04 steps/s, bytes_out=2526, bytes_in=967
+run_total: mean_us=12786.5, p50_us=12432.5, p90_us=12614.4, p99_us=23683.5
+legacy: steps=99, throughput=73.96 steps/s, bytes_out=713, bytes_in=1282
+run_total: mean_us=13489.1, p50_us=12184.3, p90_us=12566.7, p99_us=62979.6
